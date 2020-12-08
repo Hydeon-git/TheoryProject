@@ -3,7 +3,6 @@
 
 #include "SString.h"
 
-#include "PugiXml/src/pugixml.hpp"
 
 class App;
 
@@ -21,7 +20,7 @@ public:
 
 	// Called before render is available
 	// L01: DONE 5: Sending config file to all modules
-	virtual bool Awake(pugi::xml_node&)
+	virtual bool Awake()
 	{
 		return true;
 	}

@@ -1,5 +1,6 @@
 #include "Window.h"
 #include "App.h"
+#include "Globals.h"
 
 #include "Defs.h"
 #include "Log.h"
@@ -20,7 +21,7 @@ Window::~Window()
 }
 
 // Called before render is available
-bool Window::Awake(pugi::xml_node& config)
+bool Window::Awake()
 {
 	LOG("Init SDL window & surface");
 	bool ret = true;
@@ -32,24 +33,36 @@ bool Window::Awake(pugi::xml_node& config)
 	}
 	else
 	{
-		// Create window
-		// L01: DONE 6: Load all required configurations from config.xml
+		//Create window
+		int width = SCREEN_WIDTH * SCREEN_SIZE;
+		int height = SCREEN_HEIGHT * SCREEN_SIZE;
 		Uint32 flags = SDL_WINDOW_SHOWN;
-		bool fullscreen = config.child("fullscreen").attribute("value").as_bool(false);
-		bool borderless = config.child("borderless").attribute("value").as_bool(false);
-		bool resizable = config.child("resizable").attribute("value").as_bool(false);
-		bool fullscreen_window = config.child("fullscreen_window").attribute("value").as_bool(false);
 
-		width = config.child("resolution").attribute("width").as_int(640);
-		height = config.child("resolution").attribute("height").as_int(480);
-		scale = config.child("resolution").attribute("scale").as_int(1);
+		////Use OpenGL 2.1
+		//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+		//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 
-		if(fullscreen == true) flags |= SDL_WINDOW_FULLSCREEN;
-		if(borderless == true) flags |= SDL_WINDOW_BORDERLESS;
-		if(resizable == true) flags |= SDL_WINDOW_RESIZABLE;
-		if(fullscreen_window == true) flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+		if(WIN_FULLSCREEN == true)
+		{
+			flags |= SDL_WINDOW_FULLSCREEN;
+		}
 
-		window = SDL_CreateWindow(app->GetTitle(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
+		if(WIN_RESIZABLE == true)
+		{
+			flags |= SDL_WINDOW_RESIZABLE;
+		}
+
+		if(WIN_BORDERLESS == true)
+		{
+			flags |= SDL_WINDOW_BORDERLESS;
+		}
+
+		if(WIN_FULLSCREEN_DESKTOP == true)
+		{
+			flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+		}
+
+		window = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
 
 		if(window == NULL)
 		{
@@ -58,7 +71,7 @@ bool Window::Awake(pugi::xml_node& config)
 		}
 		else
 		{
-			// Get window surface
+			//Get window surface
 			screenSurface = SDL_GetWindowSurface(window);
 		}
 	}

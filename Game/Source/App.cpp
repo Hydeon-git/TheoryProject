@@ -5,6 +5,7 @@
 #include "Textures.h"
 #include "Audio.h"
 #include "Scene.h"
+#include "Physics.h"
 
 #include "Defs.h"
 #include "Log.h"
@@ -23,6 +24,7 @@ App::App(int argc, char* args[]) : argc(argc), args(args)
 	tex = new Textures();
 	audio = new Audio();
 	scene = new Scene();
+	physics = new Physics();
 
 	// Ordered for awake / Start / Update
 	// Reverse order of CleanUp
@@ -30,7 +32,12 @@ App::App(int argc, char* args[]) : argc(argc), args(args)
 	AddModule(input);
 	AddModule(tex);
 	AddModule(audio);
+	AddModule(physics);
+
+
+	//Scenes
 	AddModule(scene);
+	
 
 	// Render last to swap buffer
 	AddModule(render);
@@ -40,7 +47,7 @@ App::App(int argc, char* args[]) : argc(argc), args(args)
 App::~App()
 {
 	// Release modules
-	ListItem<Module*>* item = modules.end;
+	p2List_item<Module*>* item = modules.getLast();
 
 	while(item != NULL)
 	{
@@ -48,50 +55,28 @@ App::~App()
 		item = item->prev;
 	}
 
-	modules.Clear();
+	modules.clear();
 }
 
 void App::AddModule(Module* module)
 {
 	module->Init();
-	modules.Add(module);
+	modules.add(module);
 }
 
 // Called before render is available
 bool App::Awake()
 {
-	// TODO 3: Load config from XML
-	bool ret = LoadConfig();
-
-	if(ret == true)
-	{
-		// TODO 4: Read the title from the config file
-		title.Create(configApp.child("title").child_value());
-		win->SetTitle(title.GetString());
-
-		ListItem<Module*>* item;
-		item = modules.start;
-
-		while(item != NULL && ret == true)
-		{
-			// TODO 5: Add a new argument to the Awake method to receive a pointer to an xml node.
-			// If the section with the module name exists in config.xml, fill the pointer with the valid xml_node
-			// that can be used to read all variables for that module.
-			// Send nullptr if the node does not exist in config.xml
-			ret = item->data->Awake(config.child(item->data->name.GetString()));
-			item = item->next;
-		}
-	}
-
-	return ret;
+	
+	return true;
 }
 
 // Called before the first frame
 bool App::Start()
 {
 	bool ret = true;
-	ListItem<Module*>* item;
-	item = modules.start;
+	p2List_item<Module*>* item;
+	item = modules.getFirst();
 
 	while(item != NULL && ret == true)
 	{
@@ -124,29 +109,6 @@ bool App::Update()
 	return ret;
 }
 
-// Load config from XML file
-bool App::LoadConfig()
-{
-	bool ret = true;
-
-	// TODO 3: Load config.xml file using load_file() method from the xml_document class
-	pugi::xml_parse_result result = configFile.load_file("config.xml");
-
-	// TODO 3: Check result for loading errors
-	if(result == NULL)
-	{
-		LOG("Could not load map xml file config.xml. pugi error: %s", result.description());
-		ret = false;
-	}
-	else
-	{
-		config = configFile.child("config");
-		configApp = config.child("app");
-	}
-
-	return ret;
-}
-
 // ---------------------------------------------
 void App::PrepareUpdate()
 {
@@ -163,10 +125,10 @@ bool App::PreUpdate()
 {
 	bool ret = true;
 
-	ListItem<Module*>* item;
+	p2List_item<Module*>* item;
 	Module* pModule = NULL;
 
-	for(item = modules.start; item != NULL && ret == true; item = item->next)
+	for(item = modules.getFirst(); item != NULL && ret == true; item = item->next)
 	{
 		pModule = item->data;
 
@@ -184,11 +146,11 @@ bool App::PreUpdate()
 bool App::DoUpdate()
 {
 	bool ret = true;
-	ListItem<Module*>* item;
-	item = modules.start;
+	p2List_item<Module*>* item;
+	item = modules.getFirst();
 	Module* pModule = NULL;
 
-	for(item = modules.start; item != NULL && ret == true; item = item->next)
+	for(item = modules.getFirst(); item != NULL && ret == true; item = item->next)
 	{
 		pModule = item->data;
 
@@ -206,10 +168,10 @@ bool App::DoUpdate()
 bool App::PostUpdate()
 {
 	bool ret = true;
-	ListItem<Module*>* item;
+	p2List_item<Module*>* item;
 	Module* pModule = NULL;
 
-	for(item = modules.start; item != NULL && ret == true; item = item->next)
+	for(item = modules.getFirst(); item != NULL && ret == true; item = item->next)
 	{
 		pModule = item->data;
 
@@ -227,8 +189,8 @@ bool App::PostUpdate()
 bool App::CleanUp()
 {
 	bool ret = true;
-	ListItem<Module*>* item;
-	item = modules.end;
+	p2List_item<Module*>* item;
+	item = modules.getLast();
 
 	while(item != NULL && ret == true)
 	{
@@ -265,5 +227,4 @@ const char* App::GetOrganization() const
 {
 	return organization.GetString();
 }
-
 

@@ -18,7 +18,7 @@ Textures::~Textures()
 {}
 
 // Called before render is available
-bool Textures::Awake(pugi::xml_node& config)
+bool Textures::Awake()
 {
 	LOG("Init Image library");
 	bool ret = true;
@@ -48,14 +48,14 @@ bool Textures::Start()
 bool Textures::CleanUp()
 {
 	LOG("Freeing textures and Image library");
-	ListItem<SDL_Texture*>* item;
+	p2List_item<SDL_Texture*>* item;
 
-	for(item = textures.start; item != NULL; item = item->next)
+	for(item = textures.getFirst(); item != NULL; item = item->next)
 	{
 		SDL_DestroyTexture(item->data);
 	}
 
-	textures.Clear();
+	textures.clear();
 	IMG_Quit();
 	return true;
 }
@@ -82,14 +82,14 @@ SDL_Texture* const Textures::Load(const char* path)
 // Unload texture
 bool Textures::UnLoad(SDL_Texture* texture)
 {
-	ListItem<SDL_Texture*>* item;
+	p2List_item<SDL_Texture*>* item;
 
-	for(item = textures.start; item != NULL; item = item->next)
+	for(item = textures.getFirst(); item != NULL; item = item->next)
 	{
 		if(texture == item->data)
 		{
 			SDL_DestroyTexture(item->data);
-			textures.Del(item);
+			textures.del(item);
 			return true;
 		}
 	}
@@ -108,7 +108,7 @@ SDL_Texture* const Textures::LoadSurface(SDL_Surface* surface)
 	}
 	else
 	{
-		textures.Add(texture);
+		textures.add(texture);
 	}
 
 	return texture;

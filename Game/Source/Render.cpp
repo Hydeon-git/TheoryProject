@@ -21,19 +21,18 @@ Render::~Render()
 {}
 
 // Called before render is available
-bool Render::Awake(pugi::xml_node& config)
+bool Render::Awake()
 {
 	LOG("Create SDL rendering context");
 	bool ret = true;
 
 	Uint32 flags = SDL_RENDERER_ACCELERATED;
 
-	if(config.child("vsync").attribute("value").as_bool(true) == true)
+	if (VSYNC && SDL_GL_SetSwapInterval(1) < 0)
 	{
-		flags |= SDL_RENDERER_PRESENTVSYNC;
-		LOG("Using vsync");
+		LOG("Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
 	}
-
+	
 	renderer = SDL_CreateRenderer(app->win->window, -1, flags);
 
 	if(renderer == NULL)

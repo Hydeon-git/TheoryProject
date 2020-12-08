@@ -99,11 +99,16 @@
     <ClCompile Include="Source\App.cpp" />
     <ClCompile Include="Source\Audio.cpp" />
     <ClCompile Include="Source\Input.cpp" />
+    <ClCompile Include="Source\Physics.cpp" />
     <ClCompile Include="Source\Scene.cpp" />
     <ClCompile Include="Source\Render.cpp" />
     <ClCompile Include="Source\Textures.cpp" />
     <ClCompile Include="Source\Window.cpp" />
-    <ClInclude Include="Source\Queue.h" />
+    <ClInclude Include="Source\Globals.h" />
+    <ClInclude Include="Source\p2DynArray.h" />
+    <ClInclude Include="Source\p2List.h" />
+    <ClInclude Include="Source\p2Point.h" />
+    <ClInclude Include="Source\Physics.h" />
     <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\Audio.h" />
     <ClInclude Include="Source\Input.h" />
@@ -113,15 +118,9 @@
     <ClInclude Include="Source\Textures.h" />
     <ClInclude Include="Source\Window.h" />
     <ClInclude Include="Source\Defs.h" />
-    <ClInclude Include="Source\List.h" />
     <ClInclude Include="Source\Log.h" />
     <ClCompile Include="Source\Log.cpp" />
-    <ClInclude Include="Source\Point.h" />
     <ClInclude Include="Source\SString.h" />
-    <ClInclude Include="Source\DynArray.h" />
-    <ClInclude Include="Source\External\PugiXml\src\pugiconfig.hpp" />
-    <ClInclude Include="Source\External\PugiXml\src\pugixml.hpp" />
-    <ClCompile Include="Source\External\PugiXml\src\pugixml.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

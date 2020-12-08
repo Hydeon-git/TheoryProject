@@ -3,7 +3,7 @@
 
 #include "Module.h"
 
-#include "Point.h"
+#include "p2Point.h"
 
 #include "SDL/include/SDL.h"
 
@@ -17,7 +17,7 @@ public:
 	virtual ~Render();
 
 	// Called before render is available
-	bool Awake(pugi::xml_node&);
+	bool Awake();
 
 	// Called before the first frame
 	bool Start();

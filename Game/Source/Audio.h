@@ -18,7 +18,7 @@ public:
 	virtual ~Audio();
 
 	// Called before render is available
-	bool Awake(pugi::xml_node&);
+	bool Awake();
 
 	// Called before quitting
 	bool CleanUp();
@@ -35,7 +35,7 @@ public:
 private:
 
 	_Mix_Music* music;
-	List<Mix_Chunk *>	fx;
+	p2List<Mix_Chunk *>	fx;
 };
 
 #endif // __AUDIO_H__

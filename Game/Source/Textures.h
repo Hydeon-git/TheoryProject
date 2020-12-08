@@ -3,7 +3,7 @@
 
 #include "Module.h"
 
-#include "List.h"
+#include "p2List.h"
 
 struct SDL_Texture;
 struct SDL_Surface;
@@ -18,7 +18,7 @@ public:
 	virtual ~Textures();
 
 	// Called before render is available
-	bool Awake(pugi::xml_node&);
+	bool Awake();
 
 	// Called before the first frame
 	bool Start();
@@ -34,7 +34,7 @@ public:
 
 public:
 
-	List<SDL_Texture*> textures;
+	p2List<SDL_Texture*> textures;
 };
 
 
