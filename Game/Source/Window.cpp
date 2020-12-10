@@ -110,5 +110,5 @@ void Window::GetWindowSize(uint& width, uint& height) const
 
 uint Window::GetScale() const
 {
-	return scale;
+	return SCREEN_SCALE;
 }

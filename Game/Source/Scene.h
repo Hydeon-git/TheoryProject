@@ -33,7 +33,8 @@ public:
 	bool CleanUp();
 
 private:
-	SDL_Texture* img;
+	SDL_Texture* spaceshipTex;
+	SDL_Texture* groundTex;
 };
 
 #endif // __SCENE_H__

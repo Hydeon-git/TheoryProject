@@ -20,20 +20,14 @@ public:
 	// Called before the first frame
 	bool Start();
 
-	// Called before all Updates
-	bool PreUpdate();
-
-	// Called each loop iteration
-	bool Update(float dt);
-
-	// Called before all Updates
-	bool PostUpdate();
-
 	// Called before quitting
 	bool CleanUp();
 
+	// Physics Functions
+	void VelocityVerlet(double &x, double &v, double a, double dt);
+
 private:
-	SDL_Texture* img;
+	SDL_Texture* spaceshipTex;
 };
 
 #endif // __PHYSICS_H__

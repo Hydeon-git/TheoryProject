@@ -34,33 +34,16 @@ bool Physics::Start()
 	return true;
 }
 
-// Called each loop iteration
-bool Physics::PreUpdate()
-{
-	return true;
-}
-
-// Called each loop iteration
-bool Physics::Update(float dt)
-{
-
-
-	return true;
-}
-
-// Called each loop iteration
-bool Physics::PostUpdate()
-{
-	bool ret = true;
-
-
-	return ret;
-}
-
 // Called before quitting
 bool Physics::CleanUp()
 {
 	LOG("Freeing scene");
 
 	return true;
+}
+
+void Physics::VelocityVerlet(double& x, double& v, double a, double dt)
+{
+	x += v * dt + 0.5 * a * dt * dt; // Update position
+	v += a * dt; // Update velocity
 }
