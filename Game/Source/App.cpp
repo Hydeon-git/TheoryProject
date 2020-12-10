@@ -34,10 +34,8 @@ App::App(int argc, char* args[]) : argc(argc), args(args)
 	AddModule(audio);
 	AddModule(physics);
 
-
 	//Scenes
-	AddModule(scene);
-	
+	AddModule(scene);	
 
 	// Render last to swap buffer
 	AddModule(render);
@@ -67,8 +65,16 @@ void App::AddModule(Module* module)
 // Called before render is available
 bool App::Awake()
 {
-	
-	return true;
+	bool ret = true;
+	// Call Init() in all modules
+	p2List_item<Module*>* item = modules.getFirst();
+
+	while (item != NULL && ret == true)
+	{
+		ret = item->data->Awake();
+		item = item->next;
+	}
+	return ret;
 }
 
 // Called before the first frame
