@@ -51,6 +51,10 @@ bool Player::PreUpdate()
 // Called each loop iteration
 bool Player::Update(float dt)
 {
+	// --------------------------------------------------
+	// Get Player Position
+	reVec2 pos = body->GetPosition();
+	// Player Movement
 	if (app->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT)
 	{
 		float a = body->GetBodyAngle();
@@ -59,22 +63,16 @@ bool Player::Update(float dt)
 	}
 	else launching = false;
 
-	if (app->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
+	if ((app->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) && (launched))
 	{
 		body->Rotate(90 * dt);
 	}
-	if (app->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
+	if ((app->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) && (launched))
 	{
 		body->Rotate(-90 * dt);
 	}
-	
-	reVec2 pos = body->GetPosition();
-
-	if (app->input->GetKey(SDL_SCANCODE_2) == KEY_REPEAT)
-	{
-		moon = true;
-	}
-
+	// --------------------------------------------------
+	// Limits
 	if (pos.x < 0)
 	{
 		body->SetPosition(0, pos.y);
@@ -85,6 +83,21 @@ bool Player::Update(float dt)
 		body->SetPosition(PIXEL_TO_METERS(SCREEN_WIDTH - 0.5), pos.y);
 		body->SetLinearVelocity(0, body->GetLinearVelocity().y);
 	}
+	if (app->render->camera.y >= 8000 - SCREEN_HEIGHT)
+	{
+		if (pos.y <= -143)
+		{
+			body->SetPosition(pos.x, -143);
+			body->SetLinearVelocity(0, 0);
+		}
+		moon = true;
+	}
+	if (pos.y <= 9)
+	{
+		launched = true;
+	}
+	// --------------------------------------------------
+	// Win Condition
 	if (pos.y >= 10)
 	{
 		body->SetPosition(pos.x, 10);
@@ -93,16 +106,8 @@ bool Player::Update(float dt)
 			body->SetLinearVelocity(0, 0);
 			finished = true;
 		}
-	}	
-	if (app->render->camera.y >= 8000 - SCREEN_HEIGHT)
-	{
-		if (pos.y <= -143)
-		{
-			body->SetPosition(pos.x, -143);
-			body->SetLinearVelocity(0, 0);
-		}		
-		moon = true;
-	}	
+	}
+	// Win Scancode
 	if (finished)
 	{
 		if (app->input->GetKey(SDL_SCANCODE_RETURN) == KEY_DOWN)

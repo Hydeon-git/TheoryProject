@@ -47,6 +47,7 @@ private:
 	bool finished = false;
 	bool moon = false;
 	bool launching = false;
+	bool launched = false;
 };
 
 #endif // __PLAYER_H__
