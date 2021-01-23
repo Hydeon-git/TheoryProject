@@ -5,7 +5,8 @@
 #include "Textures.h"
 #include "Audio.h"
 #include "Scene.h"
-#include "Physics.h"
+#include "PhysicsEngine.h"
+#include "Player.h"
 
 #include "Defs.h"
 #include "Log.h"
@@ -24,7 +25,8 @@ App::App(int argc, char* args[]) : argc(argc), args(args)
 	tex = new Textures();
 	audio = new Audio();
 	scene = new Scene();
-	physics = new Physics();
+	physics = new PhysicsEngine();
+	player = new Player();
 
 	// Ordered for awake / Start / Update
 	// Reverse order of CleanUp
@@ -33,6 +35,7 @@ App::App(int argc, char* args[]) : argc(argc), args(args)
 	AddModule(tex);
 	AddModule(audio);
 	AddModule(physics);
+	AddModule(player);
 
 	//Scenes
 	AddModule(scene);	
@@ -118,6 +121,7 @@ bool App::Update()
 // ---------------------------------------------
 void App::PrepareUpdate()
 {
+
 }
 
 // ---------------------------------------------

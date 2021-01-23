@@ -88,7 +88,7 @@ int main(int argc, char* args[])
 			LOG("CLEANUP PHASE ===============================");
 			if(app->CleanUp() == true)
 			{
-				RELEASE(app);
+				//RELEASE(app);
 				result = EXIT_SUCCESS;
 				state = EXIT;
 			}

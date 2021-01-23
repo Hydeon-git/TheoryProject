@@ -5,7 +5,8 @@
 #include "Render.h"
 #include "Window.h"
 #include "Scene.h"
-#include "Physics.h"
+#include "PhysicsEngine.h"
+#include "Player.h"
 
 #include "Defs.h"
 #include "Log.h"
@@ -31,9 +32,16 @@ bool Scene::Awake()
 // Called before the first frame
 bool Scene::Start()
 {
-	spaceshipTex = app->tex->Load("Assets/Textures/motorcito.png");
 	groundTex = app->tex->Load("Assets/Textures/ground.png");
+	fondo = app->tex->Load("Assets/Textures/background.png");
 	app->audio->PlayMusic("Assets/Audio/Music/music_spy.ogg");
+
+	//floor = app->physics->CreateBody("floor", BodyType::STATIC);
+	//floor->SetRadius(PIXEL_TO_METERS(1000));
+	//int x = SCREEN_WIDTH / 2;
+	//int y = 1250 + 2 * floor->GetBodyRadius();
+	//floor->SetPosition(reVec2(PIXEL_TO_METERS(x), PIXEL_TO_METERS(y)));
+
 	return true;
 }
 
@@ -46,12 +54,9 @@ bool Scene::PreUpdate()
 // Called each loop iteration
 bool Scene::Update(float dt)
 {
-	if (app->input->GetKey(SDL_SCANCODE_W) == SDL_KEYDOWN)
-	{
-		LOG("Add Force");
-	}
-	app->render->DrawTexture(groundTex, SCREEN_WIDTH / 6, 600);
-	app->render->DrawTexture(spaceshipTex, SCREEN_WIDTH / 2 - 20, 550);
+	app->render->DrawTexture(fondo, 0, -8000 + SCREEN_HEIGHT);
+	//app->render->DrawTexture(groundTex, SCREEN_WIDTH / 6, 600);
+	
 
 	return true;
 }
@@ -60,7 +65,6 @@ bool Scene::Update(float dt)
 bool Scene::PostUpdate()
 {
 	bool ret = true;
-
 	if(app->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_DOWN)
 		ret = false;
 

@@ -12,7 +12,8 @@
     <ClCompile Include="Source\Log.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Physics.cpp" />
+    <ClCompile Include="Source\Player.cpp" />
+    <ClCompile Include="Source\PhysicsEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Window.h" />
@@ -42,11 +43,21 @@
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Source\Globals.h" />
-    <ClInclude Include="Source\Physics.h" />
+    <ClInclude Include="Source\Player.h" />
+    <ClInclude Include="Source\reVec2.h">
+      <Filter>Rocket Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\reBody.h">
+      <Filter>Rocket Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PhysicsEngine.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Utils">
       <UniqueIdentifier>{2cad778a-d356-48b0-9fee-587f1bbb187e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rocket Engine">
+      <UniqueIdentifier>{c4dd4910-3f9d-4570-a5a6-fe1b409e38a7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

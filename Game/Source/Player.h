@@ -1,19 +1,20 @@
-#ifndef __SCENE_H__
-#define __SCENE_H__
+#pragma once
+#ifndef __PLAYER_H__
+#define __PLAYER_H__
 
+#include "reBody.h"
+#include "reVec2.h"
 #include "Module.h"
 
 struct SDL_Texture;
-class reBody;
 
-class Scene : public Module
+class Player : public Module
 {
 public:
 
-	Scene();
-
+	Player();
 	// Destructor
-	virtual ~Scene();
+	virtual ~Player();
 
 	// Called before render is available
 	bool Awake();
@@ -33,10 +34,18 @@ public:
 	// Called before quitting
 	bool CleanUp();
 
+	inline reBody* GetBody()
+	{
+		return body;
+	}
+
 private:
-	reBody* floor;
-	SDL_Texture* groundTex;
-	SDL_Texture* fondo;
+	SDL_Texture* spaceship;
+	SDL_Texture* finish;
+	reBody* body;
+	bool finished = false;
+	bool initialPos = false;
+
 };
 
-#endif // __SCENE_H__
+#endif // __PLAYER_H__

@@ -1,6 +1,8 @@
 #include "App.h"
 #include "Window.h"
 #include "Render.h"
+#include "Globals.h"
+#include "Player.h"
 
 #include "Defs.h"
 #include "Log.h"
@@ -46,6 +48,8 @@ bool Render::Awake()
 		camera.h = app->win->screenSurface->h;
 		camera.x = 0;
 		camera.y = 0;
+		
+		//if (app->render->camera.y >= 300) app->render->camera.y = 300;
 	}
 
 	return ret;
@@ -69,6 +73,10 @@ bool Render::PreUpdate()
 
 bool Render::Update(float dt)
 {
+	camera.x = 0;
+	camera.y = METERS_TO_PIXELS (-app->player->GetBody()->GetPosition().y + SCREEN_HEIGHT / 2);
+	if (app->render->camera.y <= 0) app->render->camera.y = 0;
+	if (app->render->camera.y >= 8000 - SCREEN_HEIGHT) app->render->camera.y = 8000- SCREEN_HEIGHT;
 	return true;
 }
 
