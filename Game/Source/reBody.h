@@ -58,8 +58,8 @@ public:
 
 	void AddMomentum(float a)
 	{
-		reVec2 mom = reVec2(cos(a - PI / 2), sin(a - PI / 2));
-		reVec2 v = reVec2(PIXEL_TO_METERS(mom.x * 0.00016 * 150), PIXEL_TO_METERS(mom.y * 0.00016 * 150));
+		reVec2 momentum = reVec2(cos(a - PI / 2), sin(a - PI / 2));
+		reVec2 v = reVec2(PIXEL_TO_METERS(momentum.x * 150 * 0.00016), PIXEL_TO_METERS(momentum.y * 150 * 0.00016));
 		linearV += v;
 	}
 
@@ -67,8 +67,7 @@ public:
 	void Rotate(float ang)
 	{
 		angle += ang * PI / 180;
-		if (angle >= 360)
-			angle = 0;
+		if (angle >= 360) angle = 0;
 	}
 
 	bool IsActive() { return active; }

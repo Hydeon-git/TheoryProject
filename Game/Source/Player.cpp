@@ -37,7 +37,6 @@ bool Player::Start()
 	body->SetRadius(PIXEL_TO_METERS(18));
 	body->SetMaxLinearVelocity(reVec2(PIXEL_TO_METERS(500), PIXEL_TO_METERS(500)));
 	body->SetBodyAngle(0);
-	//fuel = 50.0f;
 
 	return true;
 }
@@ -56,22 +55,15 @@ bool Player::Update(float dt)
 		float a = body->GetBodyAngle();
 		body->AddMomentum(a);
 	}
-	
-	if (app->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
-	{
-		/*float ang = body->GetBodyAngle();
-		reVec2 mom = reVec2(cos(ang - 90 * M_PI / 180), sin(ang - 90 * M_PI / 180));
-		body->AddMomentum(reVec2(PIXEL_TO_METERS(-mom.x * 0.00016 * 250), PIXEL_TO_METERS(-mom.y * 0.00016 * 250)));*/
-	}
 
 	if (app->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
 	{
-		body->Rotate(2* 0.0016);
+		body->Rotate(2 * 0.0016);
 	}
 
 	if (app->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
 	{
-		body->Rotate(-2* 0.0016);
+		body->Rotate(-2 * 0.0016);
 	}
 
 
@@ -109,7 +101,6 @@ bool Player::Update(float dt)
 bool Player::PostUpdate()
 {
 	bool ret = true;
-	//app->render->DrawTexture(spaceship, METERS_TO_PIXELS(body->GetPosition().x), METERS_TO_PIXELS(body->GetPosition().y));
 	SDL_Rect rect = { 0,0,58,98 };
 	app->render->DrawTexture(spaceship, METERS_TO_PIXELS(body->GetPosition().x - 18), METERS_TO_PIXELS(body->GetPosition().y - 15), &rect, 1.0f, body->GetBodyAngle() * 180 / PI);
 	if (finished) app->render->DrawTexture(finish, 0, -8000 + SCREEN_HEIGHT);
