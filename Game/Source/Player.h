@@ -6,6 +6,7 @@
 #include "reVec2.h"
 #include "Module.h"
 #include "Log.h"
+#include "Animation.h"
 
 struct SDL_Texture;
 
@@ -46,9 +47,13 @@ private:
 	// Textures
 	SDL_Texture* spaceship;
 	SDL_Texture* fireSpaceship;
-	SDL_Texture* finish;	
+	SDL_Texture* astronaut;
+	SDL_Texture* flag;
+	SDL_Texture* finish;
 
-	// Bools related to win
+	Animation astronautAnim;
+	Animation flagAnim;
+
 	bool moon = false;
 	bool finished = false;
 	
@@ -60,6 +65,7 @@ private:
 	bool earthLeft = false;
 	bool outerSpace = false;
 	bool moonLeft = true;
+	bool landedMoon = false;
 };
 
 #endif // __PLAYER_H__

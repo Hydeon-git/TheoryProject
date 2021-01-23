@@ -8,8 +8,17 @@
 Player::Player() : Module()
 {
 	name.Create("player");
-}
 
+	astronautAnim.PushBack({ 0,0,68,85 });
+	astronautAnim.PushBack({ 69,0,64,85 });
+	astronautAnim.PushBack({ 133,0,67,88 });
+	astronautAnim.loop = false;
+	astronautAnim.speed = 0.0001f;
+
+	flagAnim.PushBack({ 0,0,46,54 });
+	flagAnim.PushBack({ 47,0,46,54 });
+	flagAnim.speed = 0.0001f;
+}
 // Destructor
 Player::~Player()
 {}
@@ -28,6 +37,8 @@ bool Player::Start()
 {
 	spaceship = app->tex->Load("Assets/Textures/spaceship.png");
 	fireSpaceship = app->tex->Load("Assets/Textures/fireSpaceship.png");
+	astronaut = app->tex->Load("Assets/Textures/astronaut.png");
+	flag = app->tex->Load("Assets/Textures/flag.png");
 	finish = app->tex->Load("Assets/Textures/finish.png");
 
 	body = app->physics->CreateBody("player", BodyType::EARTH_GRAVITY);
@@ -149,6 +160,9 @@ bool Player::Update(float dt)
 			body->SetLinearVelocity(0,0);
 		}
 	}
+
+	astronautAnim.Update();
+	flagAnim.Update();
 	return true;
 }
 
@@ -160,6 +174,14 @@ bool Player::PostUpdate()
 	if (!launching) app->render->DrawTexture(spaceship, METERS_TO_PIXELS(body->GetPosition().x-18), METERS_TO_PIXELS(body->GetPosition().y-35), &rect, 1.0f, body->GetBodyAngle() * 180 / PI);
 	else if (launching) app->render->DrawTexture(fireSpaceship, METERS_TO_PIXELS(body->GetPosition().x-18), METERS_TO_PIXELS(body->GetPosition().y-35), &rect, 1.0f, body->GetBodyAngle() * 180 / PI);
 	if (finished) app->render->DrawTexture(finish, 0, 0);
+	if (!landedMoon) app->render->DrawTexture(astronaut, METERS_TO_PIXELS(body->GetPosition().x + 45), METERS_TO_PIXELS(body->GetPosition().y - 25), &(astronautAnim.GetCurrentFrame()), 1.0f);
+	else if (landedMoon) app->render->DrawTexture(flag, METERS_TO_PIXELS(body->GetPosition().x + 120), METERS_TO_PIXELS(body->GetPosition().y - 10), &(flagAnim.GetCurrentFrame()), 1.0f);
+
+	if (astronautAnim.HasFinished())
+	{
+		landedMoon = true;
+		astronautAnim.Reset();
+	}
 	if (app->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_DOWN)
 		ret = false;
 
