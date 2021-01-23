@@ -41,10 +41,12 @@ public:
 
 private:
 	SDL_Texture* spaceship;
+	SDL_Texture* fireSpaceship;
 	SDL_Texture* finish;
 	reBody* body;
 	bool finished = false;
 	bool moon = false;
+	bool launching = false;
 };
 
 #endif // __PLAYER_H__

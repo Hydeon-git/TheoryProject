@@ -26,7 +26,8 @@ bool Player::Awake()
 // Called before the first frame
 bool Player::Start()
 {
-	spaceship = app->tex->Load("Assets/Textures/motorcito.png");
+	spaceship = app->tex->Load("Assets/Textures/spaceship.png");
+	fireSpaceship = app->tex->Load("Assets/Textures/fireSpaceship.png");
 	finish = app->tex->Load("Assets/Textures/finish.png");
 
 	body = app->physics->CreateBody("player", BodyType::DYNAMIC);
@@ -54,7 +55,10 @@ bool Player::Update(float dt)
 	{
 		float a = body->GetBodyAngle();
 		body->AddMomentum(a, dt);
+		launching = true;
 	}
+	else launching = false;
+
 	if (app->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
 	{
 		body->Rotate(90 * dt);
@@ -117,8 +121,9 @@ bool Player::Update(float dt)
 bool Player::PostUpdate()
 {
 	bool ret = true;
-	SDL_Rect rect = { 0,0,58,98 };
-	app->render->DrawTexture(spaceship, METERS_TO_PIXELS(body->GetPosition().x - 18), METERS_TO_PIXELS(body->GetPosition().y - 15), &rect, 1.0f, body->GetBodyAngle() * 180 / PI);
+	SDL_Rect rect = { 0,0,58,141 };
+	if (!launching) app->render->DrawTexture(spaceship, METERS_TO_PIXELS(body->GetPosition().x-18), METERS_TO_PIXELS(body->GetPosition().y-35), &rect, 1.0f, body->GetBodyAngle() * 180 / PI);
+	else if (launching) app->render->DrawTexture(fireSpaceship, METERS_TO_PIXELS(body->GetPosition().x-18), METERS_TO_PIXELS(body->GetPosition().y-35), &rect, 1.0f, body->GetBodyAngle() * 180 / PI);
 	if (finished) app->render->DrawTexture(finish, 0, 0);
 	if (app->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_DOWN)
 		ret = false;
