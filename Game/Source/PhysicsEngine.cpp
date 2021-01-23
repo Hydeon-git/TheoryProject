@@ -41,7 +41,7 @@ bool PhysicsEngine::PreUpdate()
 // Called each loop iteration
 bool PhysicsEngine::Update(float dt)
 {
-	step(0.00016);
+	step(dt);
 
 	return true;
 }

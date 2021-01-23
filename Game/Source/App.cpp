@@ -117,18 +117,13 @@ bool App::Update()
 	FinishUpdate();
 	return ret;
 }
-
-// ---------------------------------------------
 void App::PrepareUpdate()
 {
-
+	dt = frameTime.ReadSec();
+	frameTime.Start();
 }
-
-// ---------------------------------------------
 void App::FinishUpdate()
-{
-	// This is a good place to call Load / Save functions
-}
+{}
 
 // Call modules before each loop iteration
 bool App::PreUpdate()

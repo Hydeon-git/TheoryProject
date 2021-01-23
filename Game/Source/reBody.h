@@ -56,10 +56,10 @@ public:
 		acceleration = force / mass;
 	}
 
-	void AddMomentum(float a)
+	void AddMomentum(float a, float dt)
 	{
 		reVec2 momentum = reVec2(cos(a - PI / 2), sin(a - PI / 2));
-		reVec2 v = reVec2(PIXEL_TO_METERS(momentum.x * 150 * 0.00016), PIXEL_TO_METERS(momentum.y * 150 * 0.00016));
+		reVec2 v = reVec2(PIXEL_TO_METERS(momentum.x * 250 * dt), PIXEL_TO_METERS(momentum.y * 250 * dt));
 		linearV += v;
 	}
 

@@ -53,17 +53,17 @@ bool Player::Update(float dt)
 	if (app->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT )
 	{
 		float a = body->GetBodyAngle();
-		body->AddMomentum(a);
+		body->AddMomentum(a, dt);
 	}
 
 	if (app->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
 	{
-		body->Rotate(2 * 0.0016);
+		body->Rotate(50 * dt);
 	}
 
 	if (app->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
 	{
-		body->Rotate(-2 * 0.0016);
+		body->Rotate(-50 * dt);
 	}
 
 

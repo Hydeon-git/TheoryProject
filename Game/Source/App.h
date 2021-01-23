@@ -3,6 +3,7 @@
 
 #include "Module.h"
 #include "p2List.h"
+#include "Timer.h"
 
 
 // Modules
@@ -85,8 +86,10 @@ private:
 
 	p2List<Module *> modules;
 
+	Timer frameTime;
+	float dt = 0.0f;
 	uint frames;
-	float dt;
+	
 };
 
 extern App* app;
