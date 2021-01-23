@@ -6,7 +6,8 @@
 
 enum class BodyType
 {
-	DYNAMIC,
+	EARTH_GRAVITY,
+	MOON_GRAVITY,
 	STATIC,
 	NO_GRAVITY,
 };
@@ -61,6 +62,13 @@ public:
 		reVec2 momentum = reVec2(cos(a - PI / 2), sin(a - PI / 2));
 		reVec2 v = reVec2(PIXEL_TO_METERS(momentum.x * 250 * dt), PIXEL_TO_METERS(momentum.y * 250 * dt));
 		linearV += v;
+	}
+	
+	void AddNegativeMomentum(float a, float dt)
+	{
+		reVec2 momentum = reVec2(cos(a - PI / 2), sin(a - PI / 2));
+		reVec2 v = reVec2(PIXEL_TO_METERS(momentum.x * 250 * dt), PIXEL_TO_METERS(momentum.y * 250 * dt));
+		linearV -= v;
 	}
 
 	// Rotate a body. NOTE: ang must be on DEGREES.

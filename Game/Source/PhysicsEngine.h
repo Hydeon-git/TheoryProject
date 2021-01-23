@@ -55,7 +55,8 @@ private:
 
 private:
 
-	reVec2 gravity;
+	reVec2 earthGravity;
+	reVec2 moonGravity;
 	float aeroDrag;
 	float aeroLift;
 	float hydroBuoy;

@@ -30,7 +30,7 @@ bool Player::Start()
 	fireSpaceship = app->tex->Load("Assets/Textures/fireSpaceship.png");
 	finish = app->tex->Load("Assets/Textures/finish.png");
 
-	body = app->physics->CreateBody("player", BodyType::DYNAMIC);
+	body = app->physics->CreateBody("player", BodyType::EARTH_GRAVITY);
 
 	body->SetPosition(reVec2(PIXEL_TO_METERS(500), PIXEL_TO_METERS(500)));
 	body->SetLinearVelocity(reVec2(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)));
@@ -63,6 +63,13 @@ bool Player::Update(float dt)
 	}
 	else launching = false;
 
+	if (app->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
+	{
+		float b = body->GetBodyAngle();
+		body->AddNegativeMomentum(b, dt);
+		launching = true;
+	}
+
 	if ((app->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) && (launched))
 	{
 		body->Rotate(90 * dt);
@@ -85,16 +92,39 @@ bool Player::Update(float dt)
 	}
 	if (app->render->camera.y >= 8000 - SCREEN_HEIGHT)
 	{
-		if (pos.y <= -143)
+		if (pos.y <= -143 )
 		{
 			body->SetPosition(pos.x, -143);
-			body->SetLinearVelocity(0, 0);
+			if (!moon)
+			{
+				body->SetLinearVelocity(0, 0);
+			}
+			body->SetLinearVelocity(0, body->GetLinearVelocity().x);
 		}
 		moon = true;
 	}
 	if (pos.y <= 9)
 	{
 		launched = true;
+	}
+	// --------------------------------------------------
+	// Gravity Changes
+	if ((pos.y <= -50) && (!earthLeft))
+	{
+		earthLeft = true;
+		outerSpace = true;
+		body->type = BodyType::NO_GRAVITY;
+		LOG("-------------------------");
+		LOG("Leaving Earth planet ");
+		LOG("Entring the outer space ");
+	}
+	if ((pos.y <= -135) && (outerSpace))
+	{
+		outerSpace = false;
+		moonLeft = false;
+		body->type = BodyType::MOON_GRAVITY;
+		LOG("------------------------- ");
+		LOG("Entring moon athmosphere ");
 	}
 	// --------------------------------------------------
 	// Win Condition

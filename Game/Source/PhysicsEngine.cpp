@@ -6,7 +6,8 @@
 
 PhysicsEngine::PhysicsEngine() : Module()
 {
-	gravity = reVec2(PIXEL_TO_METERS(0), PIXEL_TO_METERS(100));
+	earthGravity = reVec2(PIXEL_TO_METERS(0), PIXEL_TO_METERS(98));
+	moonGravity = reVec2(PIXEL_TO_METERS(0), PIXEL_TO_METERS(16));
 	aeroDrag = 0.3f;
 	aeroLift = 0.3f;
 	hydroDrag = 0.3f;
@@ -71,7 +72,7 @@ reVec2 PhysicsEngine::forceGrav(float gravity, float mass1, float mass2, float d
 
 reVec2 PhysicsEngine::Gravity()
 {
-	return gravity;
+	return earthGravity;
 }
 
 reVec2 PhysicsEngine::forceAeroDrag(reBody* b)
@@ -128,8 +129,11 @@ void PhysicsEngine::step(float dt)
 	p2List_item<reBody*>* item = bodyList.getFirst();
 	while (item != nullptr)
 	{
-		if(item->data->type == BodyType::DYNAMIC && item->data->IsActive())
-			Integrator(item->data->GetPosition(), item->data->GetLinearVelocity(), item->data->GetAcceleration() + gravity, dt);
+		if(item->data->type == BodyType::EARTH_GRAVITY && item->data->IsActive())
+			Integrator(item->data->GetPosition(), item->data->GetLinearVelocity(), item->data->GetAcceleration() + earthGravity, dt);
+		
+		else if(item->data->type == BodyType::MOON_GRAVITY && item->data->IsActive())
+			Integrator(item->data->GetPosition(), item->data->GetLinearVelocity(), item->data->GetAcceleration() - earthGravity, dt);
 
 		else if(item->data->type == BodyType::NO_GRAVITY && item->data->IsActive())
 			Integrator(item->data->GetPosition(), item->data->GetLinearVelocity(), item->data->GetAcceleration(), dt);

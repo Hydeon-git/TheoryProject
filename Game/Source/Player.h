@@ -5,6 +5,7 @@
 #include "reBody.h"
 #include "reVec2.h"
 #include "Module.h"
+#include "Log.h"
 
 struct SDL_Texture;
 
@@ -40,14 +41,25 @@ public:
 	}
 
 private:
+	reBody* body;
+
+	// Textures
 	SDL_Texture* spaceship;
 	SDL_Texture* fireSpaceship;
-	SDL_Texture* finish;
-	reBody* body;
-	bool finished = false;
+	SDL_Texture* finish;	
+
+	// Bools related to win
 	bool moon = false;
+	bool finished = false;
+	
+	// Launch control bools
 	bool launching = false;
 	bool launched = false;
+
+	// Gravity changes bools
+	bool earthLeft = false;
+	bool outerSpace = false;
+	bool moonLeft = true;
 };
 
 #endif // __PLAYER_H__
