@@ -44,8 +44,7 @@ private:
 	SDL_Texture* finish;
 	reBody* body;
 	bool finished = false;
-	bool initialPos = false;
-
+	bool moon = false;
 };
 
 #endif // __PLAYER_H__
