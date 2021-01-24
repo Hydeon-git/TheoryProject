@@ -62,14 +62,12 @@ bool Player::Start()
 	loseScene = app->tex->Load("Assets/Textures/loseScene.png");
 	winScene = app->tex->Load("Assets/Textures/winScene.png");
 
-	body = app->physics->CreateBody("player", BodyType::EARTH_GRAVITY);
+	body = app->physics->CreateBody(reBodyType::EARTH_GRAVITY);
 
-	body->SetPosition(reVec2(PIXEL_TO_METERS(500), PIXEL_TO_METERS(500)));
-	body->SetLinearVelocity(reVec2(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)));
+	body->SetPosition(10, 10);
+	body->SetLinearVelocity(0, 0);
+	body->SetAngle(0);
 	body->SetMass(0.1);
-	body->SetRadius(PIXEL_TO_METERS(18));
-	body->SetMaxLinearVelocity(reVec2(PIXEL_TO_METERS(500), PIXEL_TO_METERS(500)));
-	body->SetBodyAngle(0);
 
 	return true;
 }
@@ -87,14 +85,14 @@ bool Player::Update(float dt)
 	// Get Player Position
 	reVec2 pos = body->GetPosition();
 
-	if ((body->GetBodyAngle() * RADTODEG >= 360) || (body->GetBodyAngle() * RADTODEG <= -360))
+	if ((body->GetAngle() * RADTODEG >= 360) || (body->GetAngle() * RADTODEG <= -360))
 	{
-		body->SetBodyAngle(0);
+		body->SetAngle(0);
 	}
 	// Player Movement
 	if (app->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT && !moonAnim && !deadAnim)
 	{
-		float a = body->GetBodyAngle();
+		float a = body->GetAngle();
 		body->AddMomentum(a, dt);
 		//a = a * RADTODEG;
 		launching = true;
@@ -103,7 +101,7 @@ bool Player::Update(float dt)
 
 	if ((app->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) && (rotation) && !moonAnim && !deadAnim)
 	{
-		float b = body->GetBodyAngle();
+		float b = body->GetAngle();
 
 		body->AddNegativeMomentum(b, dt);
 	}
@@ -133,7 +131,7 @@ bool Player::Update(float dt)
 		{
 			if (body->GetLinearVelocity().y > -20)
 			{
-				float ang = body->GetBodyAngle();
+				float ang = body->GetAngle();
 				ang = ang * RADTODEG;
 				if (((ang > 160 && ang < 200) || (ang < -160 && ang > -200)))
 				{
@@ -163,7 +161,7 @@ bool Player::Update(float dt)
 		{
 			if (body->GetLinearVelocity().y < 20)
 			{
-				float ang = body->GetBodyAngle();
+				float ang = body->GetAngle();
 				ang = ang * RADTODEG;
 				if (((ang > 340 && ang <= 0) || (ang < 20 && ang >= 0) || (ang < -340 && ang >= 0) || (ang > -20 && ang <= 0)))
 				{
@@ -177,7 +175,7 @@ bool Player::Update(float dt)
 				}
 				else
 				{
-					body->SetBodyAngle(0);
+					body->SetAngle(0);
 					body->SetPosition(pos.x, 10);
 					body->SetLinearVelocity(0, body->GetLinearVelocity().y);
 					if (!lost) deadAnim = true;
@@ -185,7 +183,7 @@ bool Player::Update(float dt)
 			}
 			else
 			{
-				body->SetBodyAngle(0);
+				body->SetAngle(0);
 				body->SetPosition(pos.x, 10);
 				body->SetLinearVelocity(0, body->GetLinearVelocity().y);
 				if (!lost) deadAnim = true;
@@ -208,7 +206,7 @@ bool Player::Update(float dt)
 	{
 		earthLeft = true;
 		outerSpace = true;
-		body->type = BodyType::NO_GRAVITY;
+		body->type = reBodyType::NO_GRAVITY;
 		LOG("-------------------------");
 		LOG("Leaving Earth planet ");
 		LOG("Entring the outer space ");
@@ -217,7 +215,7 @@ bool Player::Update(float dt)
 	{
 		outerSpace = false;
 		earthLeft = false;		
-		body->type = BodyType::EARTH_GRAVITY;
+		body->type = reBodyType::EARTH_GRAVITY;
 		LOG("-------------------------");
 		LOG("Leaving the outer space ");
 		LOG("Entring Earth planet ");
@@ -226,7 +224,7 @@ bool Player::Update(float dt)
 	{
 		outerSpace = false;
 		moonLeft = false;
-		body->type = BodyType::MOON_GRAVITY;
+		body->type = reBodyType::MOON_GRAVITY;
 		LOG("------------------------- ");
 		LOG("Entring moon athmosphere ");
 	}
@@ -234,7 +232,7 @@ bool Player::Update(float dt)
 	{
 		moonLeft = true;
 		outerSpace = true;
-		body->type = BodyType::NO_GRAVITY;
+		body->type = reBodyType::NO_GRAVITY;
 		LOG("------------------------- ");
 		LOG("Leaving moon athmosphere ");
 		LOG("Entring the outer space ");
@@ -252,10 +250,9 @@ bool Player::Update(float dt)
 			earthLeft = false;
 			outerSpace = false;
 			moonLeft = true;
-			reVec2 pos2 = reVec2(10, 10);
-			body->SetPosition(pos2);
+			body->SetPosition(10, 10);
 			body->SetLinearVelocity(0,0);
-			body->SetBodyAngle(0);
+			body->SetAngle(0);
 		}
 	}
 	// Lose Scancode
@@ -269,11 +266,10 @@ bool Player::Update(float dt)
 			earthLeft = false;
 			outerSpace = false;
 			moonLeft = true;
-			reVec2 pos2 = reVec2(10, 10);
-			body->SetPosition(pos2);
+			body->SetPosition(10, 10);
 			body->SetLinearVelocity(0,0);
-			body->SetBodyAngle(0);
-			body->type = BodyType::EARTH_GRAVITY;
+			body->SetAngle(0);
+			body->type = reBodyType::EARTH_GRAVITY;
 		}
 	}
 
@@ -288,8 +284,8 @@ bool Player::PostUpdate()
 {
 	bool ret = true;
 	SDL_Rect rect = { 0,0,58,141 };
-	if (!launching && !deadAnim) app->render->DrawTexture(spaceship, METERS_TO_PIXELS(body->GetPosition().x-18), METERS_TO_PIXELS(body->GetPosition().y-35), &rect, 1.0f, body->GetBodyAngle() * RADTODEG);
-	else if (launching) app->render->DrawTexture(fireSpaceship, METERS_TO_PIXELS(body->GetPosition().x-18), METERS_TO_PIXELS(body->GetPosition().y-35), &rect, 1.0f, body->GetBodyAngle() * RADTODEG);
+	if (!launching && !deadAnim) app->render->DrawTexture(spaceship, METERS_TO_PIXELS(body->GetPosition().x-18), METERS_TO_PIXELS(body->GetPosition().y-35), &rect, 1.0f, body->GetAngle() * RADTODEG);
+	else if (launching) app->render->DrawTexture(fireSpaceship, METERS_TO_PIXELS(body->GetPosition().x-18), METERS_TO_PIXELS(body->GetPosition().y-35), &rect, 1.0f, body->GetAngle() * RADTODEG);
 	
 	
 	if (moonAnim && !flagMoon) app->render->DrawTexture(astronaut, METERS_TO_PIXELS(body->GetPosition().x + 45), METERS_TO_PIXELS(body->GetPosition().y - 25), &(astronautAnim.GetCurrentFrame()), 1.0f);

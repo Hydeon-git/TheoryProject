@@ -77,7 +77,7 @@ reVec2 PhysicsEngine::Gravity()
 
 reVec2 PhysicsEngine::forceAeroDrag(reBody* b)
 {
-	float density = b->GetBodyMass() /*b->*/;
+	float density = b->GetMass() /*b->*/;
 
 	reVec2 dragForce;
 
@@ -91,7 +91,7 @@ reVec2 PhysicsEngine::forceAeroDrag(reBody* b)
 
 reVec2 PhysicsEngine::forceAeroLift(reBody* b)
 {
-	float density = b->GetBodyMass() /*volumen*/;
+	float density = b->GetMass() /*volumen*/;
 
 	reVec2 liftForce;
 
@@ -112,7 +112,7 @@ reVec2 PhysicsEngine::forceHydroBuoy(reBody* b)
 
 reVec2 PhysicsEngine::forceHydroDrag(reBody* b)
 {
-	float density = b->GetBodyMass() /*b->*/;
+	float density = b->GetMass() /*b->*/;
 
 	reVec2 hydroDragForce;
 
@@ -129,14 +129,14 @@ void PhysicsEngine::step(float dt)
 	p2List_item<reBody*>* item = bodyList.getFirst();
 	while (item != nullptr)
 	{
-		if(item->data->type == BodyType::EARTH_GRAVITY && item->data->IsActive())
-			Integrator(item->data->GetPosition(), item->data->GetLinearVelocity(), item->data->GetAcceleration() + earthGravity, dt);
+		if(item->data->type == reBodyType::EARTH_GRAVITY && item->data->IsActive())
+			IntegrateVerlet(item->data->GetPosition(), item->data->GetLinearVelocity(), item->data->GetAcceleration() + earthGravity, dt);
 		
-		else if(item->data->type == BodyType::MOON_GRAVITY && item->data->IsActive())
-			Integrator(item->data->GetPosition(), item->data->GetLinearVelocity(), item->data->GetAcceleration() - moonGravity, dt);
+		else if(item->data->type == reBodyType::MOON_GRAVITY && item->data->IsActive())
+			IntegrateVerlet(item->data->GetPosition(), item->data->GetLinearVelocity(), item->data->GetAcceleration() - moonGravity, dt);
 
-		else if(item->data->type == BodyType::NO_GRAVITY && item->data->IsActive())
-			Integrator(item->data->GetPosition(), item->data->GetLinearVelocity(), item->data->GetAcceleration(), dt);
+		else if(item->data->type == reBodyType::NO_GRAVITY && item->data->IsActive())
+			IntegrateVerlet(item->data->GetPosition(), item->data->GetLinearVelocity(), item->data->GetAcceleration(), dt);
 
 		item = item->next;
 	}
@@ -145,36 +145,32 @@ void PhysicsEngine::step(float dt)
 	{
 		for (p2List_item<reBody*>* item2 = item->next; item2 != nullptr; item2 = item2->next)
 		{
-			if (Intersection(item->data, item2->data) && item->data->IsActive())
+			if (detectCollision(item->data, item2->data) && item->data->IsActive())
 			{
-				Collisions(item->data, item2->data);
+				solveCollisions(item->data, item2->data);
 			}
 		}
 	}
 }
-
-bool PhysicsEngine::Intersection(reBody* b1, reBody* b2)
+bool PhysicsEngine::detectCollision(reBody* b1, reBody* b2)
 {
 	float x = b2->GetPosition().x - (b1->GetPosition().x);
 	float y = b2->GetPosition().y - (b1->GetPosition().y);
 	float dist = sqrt(pow(x, 2) + pow(y, 2));
 
-	if (dist < b1->GetBodyRadius() + b2->GetBodyRadius())
-		return true;
-	else
-		return false;
+	return true;
 }
 
-void PhysicsEngine::Collisions(reBody* b, reBody* b2)
+void PhysicsEngine::solveCollisions(reBody* b, reBody* b2)
 {
-	
+
 	// First we get the normal corresponding from the world to the body
 	reVec2 dir = b->GetPosition() - b2->GetPosition();
 	reVec2 dirNoNormalized = dir;
 
 	// We normalize the vector, since we only want the direction
 	dir = dir.Normalize();
-	
+
 	// We get the actual velocity of the spaceship
 	reVec2 newSpeed = b->GetLinearVelocity();
 
@@ -184,17 +180,12 @@ void PhysicsEngine::Collisions(reBody* b, reBody* b2)
 	// We now multiply the speed for the direction so the spaceship knows the direction where it has to go to
 	newSpeed = dir * speed;
 
-	if (b2->GetName() == "floor")
-		newSpeed = newSpeed * 0.6f;
-	
-	else
-		newSpeed = newSpeed * 0.9f;
-
-	b->SetLinearVelocity(newSpeed);
+	b->SetLinearVelocity(newSpeed.x, newSpeed.y);
 }
-reBody* PhysicsEngine::CreateBody(SString n, BodyType type)
+
+reBody* PhysicsEngine::CreateBody(reBodyType type)
 {
-	reBody* b = new reBody(n, type);
+	reBody* b = new reBody(type);
 
 	bodyList.add(b);
 
@@ -216,14 +207,16 @@ void PhysicsEngine::DeleteBody(reBody* b)
 	}
 }
 
-void PhysicsEngine::Integrator(reVec2& pos, reVec2& v, reVec2& a, float dt)
+void PhysicsEngine::IntegrateVerlet(reVec2& pos, reVec2& v, reVec2& a, float dt)
 {
 
 	// Velocity-Verlet
-	pos.x += v.x * dt + 0.5 * a.x * dt * dt;
+	// 2nd order
+
+	pos.x += v.x * dt + 0.5 * a.x * dt * dt; // Update position (using old velocity)
 	pos.y += v.y * dt + 0.5 * a.y * dt * dt;
 
-	v.x += a.x * dt;
+	v.x += a.x * dt; // Update velocity
 	v.y += a.y * dt;
 
 }

@@ -4,52 +4,44 @@
 #include "SString.h"
 #include "Globals.h"
 
-enum class BodyType
+enum class reBodyType
 {
 	EARTH_GRAVITY,
 	MOON_GRAVITY,
-	STATIC,
 	NO_GRAVITY,
 };
 
 class reBody
 {
+public:
+	reBodyType type;
+
 private:
 	reVec2 position;
-	reVec2 linearV;
-	reVec2 maxLinearV;
-	float radius;
-	float angularV;
+	float angle;
+
+	reVec2 linearVelocity;
+
 	reVec2 acceleration;
 	reVec2 force;
 	float mass;
-	float bodyGravity;
-	float angle;
-	SString name;
+
 	bool active;
 
 public:
-	BodyType type;
-
-public:
-	// Default constructor that sets all the variables to default
-	reBody(SString n, BodyType t, bool act = true)
+	reBody(reBodyType t)
 	{
-		name = n;
-		type = t;
-		active = act;
-		position = reVec2(0.0f, 0.0f);
-		linearV = reVec2(0.0f, 0.0f);
-		maxLinearV = reVec2(0.0f, 0.0f);
-		//angularV = reVec2(0.0f, 0.0f);
-		acceleration = reVec2(0.0f, 0.0f);
-		force = reVec2(0.0f, 0.0f);
-		mass = 0.0f;
-		bodyGravity = 0.0f;
+		position.Set(0.0f, 0.0f);
 		angle = 0.0f;
+		linearVelocity.Set(0.0f, 0.0f);
+		acceleration.Set(0.0f, 0.0f);
+		force.Set(0.0f, 0.0f);
+		mass = 0.0f;
+		type = t;
+		active = true;
 	}
 
-	virtual ~reBody() {};
+	~reBody() {};
 
 	void AddForce(reVec2 f)
 	{
@@ -61,14 +53,14 @@ public:
 	{
 		reVec2 momentum = reVec2(cos(a - PI / 2), sin(a - PI / 2));
 		reVec2 v = reVec2(PIXEL_TO_METERS(momentum.x * 250 * dt), PIXEL_TO_METERS(momentum.y * 250 * dt));
-		linearV += v;
+		linearVelocity += v;
 	}
-	
+
 	void AddNegativeMomentum(float a, float dt)
 	{
 		reVec2 momentum = reVec2(cos(a - PI / 2), sin(a - PI / 2));
 		reVec2 v = reVec2(PIXEL_TO_METERS(momentum.x * 250 * dt), PIXEL_TO_METERS(momentum.y * 250 * dt));
-		linearV -= v;
+		linearVelocity -= v;
 	}
 
 	// Rotate a body. NOTE: ang must be on DEGREES.
@@ -78,126 +70,91 @@ public:
 		if (angle >= 360) angle = 0;
 	}
 
-	bool IsActive() { return active; }
-
-	// ===================================================
-	//					Setters
-	// ===================================================
-
-	void SetActive(bool act)
-	{
-		active = act;
-	}
-
-	void SetMass(float m)
-	{
-		mass = m;
-	}
-
-	// Set body position 
-	void SetPosition(reVec2 pos)
-	{
-		position = pos;
-	}
-	void SetPosition(float x, float y)
+	// Set the position of the body
+	inline void SetPosition(float x, float y)
 	{
 		position.x = x;
 		position.y = y;
 	}
 
-	// Set body linear speed
-	void SetLinearVelocity(reVec2 v)
-	{
-		linearV = v;
-	}
-
-	void SetLinearVelocity(float x, float y)
-	{
-		linearV.x = x;
-		linearV.y = y;
-	}
-
-	void SetMaxLinearVelocity(reVec2 v)
-	{
-		maxLinearV = v;
-	}
-
-	// Set body angluar speed
-	void SetAngularVelocity(reVec2 v)
-	{
-		//angularV += v;
-	}
-
-	// Set body radius
-	void SetRadius(float rad)
-	{
-		radius = rad;
-	}
-
-	void SetBodyAngle(double a)
-	{
-		angle = a;
-	}
-
-	// ===================================================
-	//					Getters
-	// ===================================================
-
-	// Get the body position
+	// Get the position of the body
 	inline reVec2& GetPosition()
 	{
 		return position;
 	}
 
-	// Get the body linear velocity
+	//Set the angle of the body (in radians)
+	inline void SetAngle(float a)
+	{
+		angle = a;
+	}
+
+	// Get the angle of the body (in radians)
+	inline float& GetAngle()
+	{
+		return angle;
+	}
+
+	// Set the linear velocity of the body 
+	inline void SetLinearVelocity(float x, float y)
+	{
+		linearVelocity.x = x;
+		linearVelocity.y = y;
+	}
+
+	// Get the linear velocity of the body 
 	inline reVec2& GetLinearVelocity()
 	{
-		return linearV;
+		return linearVelocity;
 	}
 
-	inline reVec2& GetMaxLinearVelocity()
+	// Set the acceleration of the body 
+	inline void SetAcceleration(float x, float y)
 	{
-		return maxLinearV;
+		acceleration.x = x;
+		acceleration.y = y;
 	}
 
-	// Get the body angular velocity
-	inline reVec2& GetAngularVelocity()
-	{
-		//return angularV;
-	}
-
-	// Get the body acceleration
+	// Get the acceleration of the body 
 	inline reVec2& GetAcceleration()
 	{
 		return acceleration;
 	}
 
-	// Get body mass
-	inline float& GetBodyMass()
+	// Set the mass of the body
+	inline void SetMass(float m)
+	{
+		mass = m;
+	}
+
+	// Get the mass of the body
+	inline float& GetMass()
 	{
 		return mass;
 	}
 
-	//Get gravity on the body;
-	inline float& GetBodyGravity()
+	// Set the type of the body
+	inline void SetType(reBodyType t)
 	{
-		return bodyGravity;
+		type = t;
 	}
 
-	// Get the body angle
-	inline float& GetBodyAngle()
+	// Get the type of the body
+	inline reBodyType GetType()
 	{
-		return angle;
+		return type;
 	}
 
-	// Get the body radius
-	inline float& GetBodyRadius()
+	// Set the active state of the body
+	inline void SetActive(bool act)
 	{
-		return radius;
+		active = act;
 	}
 
-	inline SString& GetName()
+	// Get the active state of the body
+	inline bool IsActive()
 	{
-		return name;
+		return active;
 	}
+
 };

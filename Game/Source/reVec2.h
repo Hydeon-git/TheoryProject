@@ -50,6 +50,7 @@ public:
 		vec.y = y - v.y;
 		return vec;
 	}
+
 	// Multply a vector
 	void operator *=(float a)
 	{
@@ -112,5 +113,5 @@ public:
 	{
 		return x * x + y * y;
 	}
-	
+
 };

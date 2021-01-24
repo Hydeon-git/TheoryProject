@@ -42,16 +42,13 @@ public:
 
 	void step(float dt);
 
-	bool Intersection(reBody* b1, reBody* b2);
-	void Collisions(reBody* b, reBody* b2);
+	void IntegrateVerlet(reVec2& x, reVec2& v, reVec2& a, float dt);
 
+	bool detectCollision(reBody* b1, reBody* b2);
+	void solveCollisions(reBody* b, reBody* b2);
 
-	reBody* CreateBody(SString n, BodyType type);
+	reBody* CreateBody(reBodyType type);
 	void DeleteBody(reBody* b);
-
-private:
-
-	void Integrator(reVec2& x, reVec2& v, reVec2& a, float dt);
 
 private:
 
