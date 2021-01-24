@@ -157,6 +157,41 @@ bool Player::Update(float dt)
 			}
 		}
 	}
+	else if (app->render->camera.y >= 0)
+	{
+		if (pos.y >= 10)
+		{
+			if (body->GetLinearVelocity().y < 20)
+			{
+				float ang = body->GetBodyAngle();
+				ang = ang * RADTODEG;
+				if (((ang > 340 && ang <= 0) || (ang < 20 && ang >= 0) || (ang < -340 && ang >= 0) || (ang > -20 && ang <= 0)))
+				{
+					body->SetPosition(pos.x, 10);
+					if (moon)
+					{
+						body->SetLinearVelocity(0, 0);
+						finished = true;
+					}
+					
+				}
+				else
+				{
+					body->SetBodyAngle(0);
+					body->SetPosition(pos.x, 10);
+					body->SetLinearVelocity(0, body->GetLinearVelocity().y);
+					if (!lost) deadAnim = true;
+				}
+			}
+			else
+			{
+				body->SetBodyAngle(0);
+				body->SetPosition(pos.x, 10);
+				body->SetLinearVelocity(0, body->GetLinearVelocity().y);
+				if (!lost) deadAnim = true;
+			}
+		}
+	}
 	if (!launched && !app->input->GetKey(SDL_SCANCODE_W) == KEY_DOWN)
 	{
 		body->SetLinearVelocity(0, 0);
@@ -205,16 +240,7 @@ bool Player::Update(float dt)
 		LOG("Entring the outer space ");
 	}	
 	// --------------------------------------------------
-	// Win Condition
-	if (pos.y >= 10)
-	{
-		body->SetPosition(pos.x, 10);
-		if (moon)
-		{
-			body->SetLinearVelocity(0, 0);
-			finished = true;
-		}
-	}
+	
 	// Win Scancode
 	if (finished)
 	{
@@ -284,7 +310,14 @@ bool Player::PostUpdate()
 		explosionAnim.Reset();
 	}
 
-	if (lost) app->render->DrawTexture(loseScene, 0, -8000 + SCREEN_HEIGHT);
+	if (lost)
+	{
+		app->render->DrawTexture(loseScene, 0, -8000 + SCREEN_HEIGHT);
+		app->render->DrawTexture(loseScene, 0, 0);
+	}
+
+
+
 	if (finished) app->render->DrawTexture(winScene, 0, 0);
 
 	if (app->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_DOWN)
