@@ -65,12 +65,14 @@ private:
 	// Launch control bools
 	bool launching = false;
 	bool launched = false;
+	bool rotation = false;
 
 	// Gravity changes bools
 	bool earthLeft = false;
 	bool outerSpace = false;
 	bool moonLeft = true;
 
+	// Animations
 	bool moonAnim = false;
 	bool flagMoon = false;
 };

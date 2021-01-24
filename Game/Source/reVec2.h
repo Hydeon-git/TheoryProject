@@ -34,7 +34,7 @@ public:
 		reVec2 vec;
 		vec.x = x + v.x;
 		vec.y = y + v.y;
-		return v;
+		return vec;
 	}
 
 	// Subtract a vector
@@ -48,10 +48,8 @@ public:
 		reVec2 vec;
 		vec.x = x - v.x;
 		vec.y = y - v.y;
-		return v;
-
+		return vec;
 	}
-
 	// Multply a vector
 	void operator *=(float a)
 	{

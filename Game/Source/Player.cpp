@@ -13,7 +13,7 @@ Player::Player() : Module()
 	astronautAnim.PushBack({ 69,0,64,85 });
 	astronautAnim.PushBack({ 133,0,67,88 });
 	astronautAnim.loop = false;
-	astronautAnim.speed = 0.0001f;
+	astronautAnim.speed = 0.001f;
 
 	explosionAnim.PushBack({   0,  0,  88,88 });
 	explosionAnim.PushBack({  88, 0, 88,88 });
@@ -32,11 +32,11 @@ Player::Player() : Module()
 	explosionAnim.PushBack({ 176,264,88,88 });
 	explosionAnim.PushBack({ 264,264,88,88 });
 	explosionAnim.loop = false;
-	explosionAnim.speed = 0.001f;
+	explosionAnim.speed = 0.01f;
 
 	flagAnim.PushBack({ 0,0,46,54 });
 	flagAnim.PushBack({ 47,0,46,54 });
-	flagAnim.speed = 0.0001f;
+	flagAnim.speed = 0.001;
 }
 // Destructor
 Player::~Player()
@@ -101,18 +101,17 @@ bool Player::Update(float dt)
 	}
 	else launching = false;
 
-	if ((app->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) && (launched) && !moonAnim && !deadAnim)
+	if ((app->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) && (rotation) && !moonAnim && !deadAnim)
 	{
 		float b = body->GetBodyAngle();
 
 		body->AddNegativeMomentum(b, dt);
 	}
-
-	if ((app->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) && (launched) && !moonAnim && !deadAnim)
+	if ((app->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) && (rotation) && !moonAnim && !deadAnim)
 	{
 		body->Rotate(90 * dt);
 	}
-	if ((app->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) && (launched) && !moonAnim && !deadAnim)
+	if ((app->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) && (rotation) && !moonAnim && !deadAnim)
 	{
 		body->Rotate(-90 * dt);
 	}
@@ -129,16 +128,26 @@ bool Player::Update(float dt)
 		body->SetLinearVelocity(0, body->GetLinearVelocity().y);
 	}
 	if (app->render->camera.y >= 8000 - SCREEN_HEIGHT)
-	{
+	{	
 		if (pos.y <= -143)
 		{
-			float ang = body->GetBodyAngle();
-			ang = ang * RADTODEG;
-			if (((ang > 160 && ang < 200) || (ang < -160 && ang > -200)) && body->GetLinearVelocity().y > -20)
+			if (body->GetLinearVelocity().y > -20)
 			{
-				body->SetPosition(pos.x, -143);
-				body->SetLinearVelocity(0, body->GetLinearVelocity().y);
-				if(!flagMoon) moonAnim = true;
+				float ang = body->GetBodyAngle();
+				ang = ang * RADTODEG;
+				if (((ang > 160 && ang < 200) || (ang < -160 && ang > -200)))
+				{
+					moon = true;
+					body->SetPosition(pos.x, -143);
+					body->SetLinearVelocity(0, body->GetLinearVelocity().y);
+					if (!flagMoon) moonAnim = true;
+				}
+				else
+				{
+					body->SetPosition(pos.x, -143);
+					body->SetLinearVelocity(0, body->GetLinearVelocity().y);
+					if (!lost) deadAnim = true;
+				}
 			}
 			else
 			{
@@ -147,18 +156,17 @@ bool Player::Update(float dt)
 				if (!lost) deadAnim = true;
 			}
 		}
-		moon = true;
 	}
-	if (pos.y <= 9)
+	if (!launched && !app->input->GetKey(SDL_SCANCODE_W) == KEY_DOWN)
 	{
-		launched = true;
+		body->SetLinearVelocity(0, 0);
 	}
-	// --------------------------------------------------
+	// Can rotate?
+	if ((pos.y <= 10) && (pos.y >= -143)) launched = true;
+	else launched = false;
 	
-
-
-
-
+	if ((pos.y <= 9) && (pos.y >= -142)) rotation = true;
+	else rotation = false;
 	// --------------------------------------------------
 	// Gravity Changes
 	if ((pos.y <= -50) && (!earthLeft))
@@ -170,6 +178,15 @@ bool Player::Update(float dt)
 		LOG("Leaving Earth planet ");
 		LOG("Entring the outer space ");
 	}
+	if ((pos.y >= -50) && (outerSpace))
+	{
+		outerSpace = false;
+		earthLeft = false;		
+		body->type = BodyType::EARTH_GRAVITY;
+		LOG("-------------------------");
+		LOG("Leaving the outer space ");
+		LOG("Entring Earth planet ");
+	}
 	if ((pos.y <= -135) && (outerSpace))
 	{
 		outerSpace = false;
@@ -178,11 +195,16 @@ bool Player::Update(float dt)
 		LOG("------------------------- ");
 		LOG("Entring moon athmosphere ");
 	}
-	// --------------------------------------------------
-	if (pos.y >= 10 && (!app->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT))
+	if ((pos.y >= -135) && (!moonLeft))
 	{
-		body->SetLinearVelocity(0, 0);
-	}
+		moonLeft = true;
+		outerSpace = true;
+		body->type = BodyType::NO_GRAVITY;
+		LOG("------------------------- ");
+		LOG("Leaving moon athmosphere ");
+		LOG("Entring the outer space ");
+	}	
+	// --------------------------------------------------
 	// Win Condition
 	if (pos.y >= 10)
 	{
@@ -252,6 +274,7 @@ bool Player::PostUpdate()
 	{
 		moonAnim = false;
 		flagMoon = true;
+		launched = false;
 		astronautAnim.Reset();
 	}
 	if (explosionAnim.HasFinished())

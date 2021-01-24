@@ -87,9 +87,9 @@ private:
 	p2List<Module *> modules;
 
 	Timer frameTime;
-	float dt = 0.0f;
 	uint frames;
-	
+public:
+	float dt = 0.0f;
 };
 
 extern App* app;

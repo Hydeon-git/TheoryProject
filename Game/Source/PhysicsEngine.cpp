@@ -133,19 +133,14 @@ void PhysicsEngine::step(float dt)
 			Integrator(item->data->GetPosition(), item->data->GetLinearVelocity(), item->data->GetAcceleration() + earthGravity, dt);
 		
 		else if(item->data->type == BodyType::MOON_GRAVITY && item->data->IsActive())
-			Integrator(item->data->GetPosition(), item->data->GetLinearVelocity(), item->data->GetAcceleration() - earthGravity, dt);
+			Integrator(item->data->GetPosition(), item->data->GetLinearVelocity(), item->data->GetAcceleration() - moonGravity, dt);
 
 		else if(item->data->type == BodyType::NO_GRAVITY && item->data->IsActive())
 			Integrator(item->data->GetPosition(), item->data->GetLinearVelocity(), item->data->GetAcceleration(), dt);
 
 		item = item->next;
 	}
-
-	/*else if (app->spaceship->GetBody()->GetPosition().y <= 0)
-		gravity.y = 9.81f - ((app->scene->floor->GetPosition().y - app->spaceship->GetBody()->GetPosition().y) / 9.81f);*/
-
 	//LOG("gravity = %f", gravity.y);
-
 	for (p2List_item<reBody*>* item = bodyList.getFirst(); item != nullptr; item = item->next)
 	{
 		for (p2List_item<reBody*>* item2 = item->next; item2 != nullptr; item2 = item2->next)
@@ -196,21 +191,6 @@ void PhysicsEngine::Collisions(reBody* b, reBody* b2)
 		newSpeed = newSpeed * 0.9f;
 
 	b->SetLinearVelocity(newSpeed);
-
-
-
-
-	/*if (b2->GetName() == "astronaut")
-	{
-		app->astronautManager->DeleteAstronaut(b2);
-		app->spaceship->AddScore();
-	}
-	else
-	{
-		b->SetLinearVelocity((newSpeed));
-	}*/
-
-
 }
 reBody* PhysicsEngine::CreateBody(SString n, BodyType type)
 {
