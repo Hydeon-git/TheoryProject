@@ -15,16 +15,16 @@ Player::Player() : Module()
 	astronautAnimR.PushBack({ 69,0,64,85 });
 	astronautAnimR.PushBack({ 133,0,67,88 });
 	astronautAnimR.loop = false;
-	astronautAnimR.speed = 3.0f;
+	astronautAnimR.speed = 2.0f;
 	
 	astronautAnimL.PushBack({ 201,0,68,85 });
 	astronautAnimL.PushBack({ 269,0,63,85 });
 	astronautAnimL.PushBack({ 334,0,66,88 });
 	astronautAnimL.loop = false;
-	astronautAnimL.speed = 3.0f;
+	astronautAnimL.speed = 2.0f;
 
-	explosionAnim.PushBack({   0,  0,  88,88 });
-	explosionAnim.PushBack({  88, 0, 88,88 });
+	explosionAnim.PushBack({ 0,  0,  88,88 });
+	explosionAnim.PushBack({ 88, 0, 88,88 });
 	explosionAnim.PushBack({ 176,0, 88,88 });
 	explosionAnim.PushBack({ 264,0, 88,88 });
 	explosionAnim.PushBack({ 0, 88, 88,88 });
@@ -77,7 +77,8 @@ bool Player::Start()
 	loseFx = app->audio->LoadFx("Assets/Audio/Fx/loseFx.ogg");
 	// --------------------------------------------------
 	// Create Spaceship and set properties
-	body = app->physics->CreateBody(reBodyType::EARTH_GRAVITY);
+	body = app->physics->createBody(reBodyType::EARTH_GRAVITY);
+
 	body->SetPosition(10, 10);
 	body->SetLinearVelocity(0, 0);
 	body->SetAngle(0);
@@ -156,13 +157,15 @@ bool Player::Update(float dt)
 				else
 				{
 					moonPlayerLeft = false;
-					flagPosX = METERS_TO_PIXELS(body->GetPosition().x - 120);
-					astronautPosX = METERS_TO_PIXELS(body->GetPosition().x - 45);
+					flagPosX = METERS_TO_PIXELS(body->GetPosition().x - 130);
+					astronautPosX = METERS_TO_PIXELS(body->GetPosition().x - 90);
 				}
 				flagPosY = METERS_TO_PIXELS(body->GetPosition().y - 10);
 				astronautPosY = METERS_TO_PIXELS(body->GetPosition().y - 25);
 			}
+
 			if (body->GetLinearVelocity().y > -20)
+			//if (body->GetLinearVelocity().y > -20 && !deadAnim && !lost)
 			{
 				float ang = body->GetAngle();
 				ang = ang * RADTODEG;
@@ -202,7 +205,7 @@ bool Player::Update(float dt)
 					if (moon)
 					{
 						winTimer.Start();
-						while (winCount <= 4.0f)
+						while (winCount <= 3.0f)
 						{
 							body->SetLinearVelocity(0, 0);
 							winCount = winTimer.Read() * 0.001f;							
@@ -344,6 +347,7 @@ bool Player::Update(float dt)
 		explosionAnim.Reset();
 	}
 	if (moonAnim) astronautAnimR.Update(dt);
+	if (moonAnim) astronautAnimL.Update(dt);
 	if(deadAnim) explosionAnim.Update(dt);
 	flagAnim.Update(dt);
 	return true;

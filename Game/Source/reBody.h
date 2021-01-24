@@ -19,13 +19,10 @@ public:
 private:
 	reVec2 position;
 	float angle;
-
 	reVec2 linearVelocity;
-
 	reVec2 acceleration;
 	reVec2 force;
 	float mass;
-
 	bool active;
 
 public:

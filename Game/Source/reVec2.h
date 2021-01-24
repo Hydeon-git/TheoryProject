@@ -5,16 +5,12 @@
 class reVec2
 {
 public:
-	double x = 0;
-	double y = 0;
-
-public:
 	reVec2() {};
 
-	reVec2(float newX, float newY)
+	reVec2(float _x, float _y)
 	{
-		x = newX;
-		y = newY;
+		x = _x;
+		y = _y;
 	}
 
 	// Set this vector to some specified coordinates.
@@ -90,16 +86,14 @@ public:
 	}
 
 	/// Convert this vector into a unit vector. Returns the length.
-	reVec2 Normalize()
+	float Normalize()
 	{
-		reVec2 aux = reVec2(x, y);
-		float l = sqrt(pow(aux.x, 2) + pow(aux.y, 2));
-		if (l != 0)
-		{
-			aux = aux / l;
-			return aux;
-		}
-		else return { 0,0 };
+		float length = Length();
+		float invLength = 1.0f / length;
+		x *= invLength;
+		y *= invLength;
+
+		return length;
 	}
 
 	// Length of vector (norm)
@@ -114,4 +108,5 @@ public:
 		return x * x + y * y;
 	}
 
+	float x, y;
 };

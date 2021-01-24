@@ -35,6 +35,7 @@ bool Scene::Start()
 	// Texture Load
 	groundTex = app->tex->Load("Assets/Textures/ground.png");
 	fondo = app->tex->Load("Assets/Textures/background.png");
+
 	// Play Music
 	app->audio->PlayMusic("Assets/Audio/Music/landing.ogg", 80);
 

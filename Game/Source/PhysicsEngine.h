@@ -6,16 +6,13 @@
 #include "reVec2.h"
 #include "reBody.h"
 
-class reVec2;
+//class reVec2;
 
 class PhysicsEngine : public Module
 {
 public:
 	PhysicsEngine();
 	~PhysicsEngine();
-
-	// Called before render is available
-	bool Awake();
 
 	// Called before the first frame
 	bool Start();
@@ -32,33 +29,19 @@ public:
 	// Called before quitting
 	bool CleanUp();
 
-	reVec2 forceGrav(float gravity, float mass1, float mass2, float distance, reVec2 direction);
+	reVec2 forceGrav(float mass1, float mass2, float r, reVec2 dir); // Compute Gravity force
+	reVec2 forceAeroDrag(reBody* b); // Compute Aerodynamic Drag force
+	reVec2 forceAeroLift(reBody* b); // Compute Aerodynamic Lift force
+	reVec2 forceHydroBuoy(reBody* b); // Compute Hydrodynamic Buoyancy force
+	reVec2 forceHydroDrag(reBody* b); // Compute Hydrodynamic Drag force
 
-	reVec2 Gravity();
-	reVec2 forceAeroDrag(reBody* b);
-	reVec2 forceAeroLift(reBody* b);
-	reVec2 forceHydroBuoy(reBody* b);
-	reVec2 forceHydroDrag(reBody* b);
+	void step(float dt);  // Step physics
+	void integrateVerlet(reVec2& x, reVec2& v, reVec2& a, float dt); // Integrator using Verlet
 
-	void step(float dt);
-
-	void IntegrateVerlet(reVec2& x, reVec2& v, reVec2& a, float dt);
-
-	bool detectCollision(reBody* b1, reBody* b2);
-	void solveCollisions(reBody* b, reBody* b2);
-
-	reBody* CreateBody(reBodyType type);
-	void DeleteBody(reBody* b);
+	reBody* createBody(reBodyType type);
 
 private:
-
+	p2List<reBody*> reBodyList;
 	reVec2 earthGravity;
-	reVec2 moonGravity;
-	float aeroDrag;
-	float aeroLift;
-	float hydroBuoy;
-	float hydroDrag;
-
-	p2List<reBody*> bodyList;
-
+	reVec2 moonGravity;	
 };
