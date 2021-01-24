@@ -7,7 +7,6 @@
 #include "Module.h"
 #include "Log.h"
 #include "Animation.h"
-
 struct SDL_Texture;
 
 class Player : public Module
@@ -44,6 +43,7 @@ public:
 private:
 	reBody* body;
 
+	// Timer
 	Timer winTimer;
 	float winCount;
 
@@ -61,9 +61,11 @@ private:
 	Animation explosionAnim;
 	Animation flagAnim;
 
+	// Moon animations positions
 	float flagPosX, flagPosY;	
 	float astronautPosX, astronautPosY;	
 
+	// Game State
 	bool moon = false;
 	bool finished = false;
 	bool deadAnim = false;
@@ -83,6 +85,10 @@ private:
 	bool moonAnim = false;
 	bool flagMoon = false;
 	bool moonPlayerLeft;
+
+	// SoundFx
+	int explosionFx;
+	int loseFx;	
 };
 
 #endif // __PLAYER_H__

@@ -4,6 +4,8 @@
 #include "PhysicsEngine.h"
 #include "Player.h"
 #include "Input.h"
+#include "Audio.h"
+
 
 Player::Player() : Module()
 {
@@ -60,6 +62,8 @@ bool Player::Awake()
 // Called before the first frame
 bool Player::Start()
 {
+	// --------------------------------------------------
+	// Texture loading
 	spaceship = app->tex->Load("Assets/Textures/spaceship.png");
 	fireSpaceship = app->tex->Load("Assets/Textures/fireSpaceship.png");
 	astronaut = app->tex->Load("Assets/Textures/astronaut.png");
@@ -67,9 +71,13 @@ bool Player::Start()
 	flag = app->tex->Load("Assets/Textures/flag.png");
 	loseScene = app->tex->Load("Assets/Textures/loseScene.png");
 	winScene = app->tex->Load("Assets/Textures/winScene.png");
-
+	// --------------------------------------------------
+	// SoundFx loading
+	explosionFx = app->audio->LoadFx("Assets/Audio/Fx/explosion.ogg");
+	loseFx = app->audio->LoadFx("Assets/Audio/Fx/loseFx.ogg");
+	// --------------------------------------------------
+	// Create Spaceship and set properties
 	body = app->physics->CreateBody(reBodyType::EARTH_GRAVITY);
-
 	body->SetPosition(10, 10);
 	body->SetLinearVelocity(0, 0);
 	body->SetAngle(0);
@@ -103,8 +111,7 @@ bool Player::Update(float dt)
 		body->AddMomentum(a, dt);
 		launching = true;
 	}
-	else launching = false;
-
+	else launching = false;	
 	if ((app->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) && (rotation) && (!moonAnim) && (!deadAnim))
 	{
 		float b = body->GetAngle();
@@ -171,6 +178,7 @@ bool Player::Update(float dt)
 				{
 					body->SetPosition(pos.x, -143);
 					body->SetLinearVelocity(0, body->GetLinearVelocity().y);
+					app->audio->PlayFx(explosionFx, 30);
 					if (!lost) deadAnim = true;
 				}
 			}
@@ -178,6 +186,7 @@ bool Player::Update(float dt)
 			{
 				body->SetPosition(pos.x, -143);
 				body->SetLinearVelocity(0, body->GetLinearVelocity().y);
+				app->audio->PlayFx(explosionFx, 30);
 				if (!lost) deadAnim = true;
 			}
 		}
@@ -210,6 +219,7 @@ bool Player::Update(float dt)
 					body->SetAngle(0);
 					body->SetPosition(pos.x, 10);
 					body->SetLinearVelocity(0, body->GetLinearVelocity().y);
+					app->audio->PlayFx(explosionFx, 30);
 					if (!lost) deadAnim = true;
 				}
 			}
@@ -219,6 +229,7 @@ bool Player::Update(float dt)
 				body->SetAngle(0);
 				body->SetPosition(pos.x, 10);
 				body->SetLinearVelocity(0, body->GetLinearVelocity().y);
+				app->audio->PlayFx(explosionFx, 30);
 				if (!lost) deadAnim = true;
 			}
 		}
@@ -231,8 +242,7 @@ bool Player::Update(float dt)
 	}
 	// Can rotate?
 	if ((pos.y <= 10) && (pos.y >= -143)) launched = true;
-	else launched = false;
-	
+	else launched = false;	
 	if ((pos.y <= 9) && (pos.y >= -142)) rotation = true;
 	else rotation = false;
 	// --------------------------------------------------
@@ -271,7 +281,7 @@ bool Player::Update(float dt)
 		LOG("------------------------- ");
 		LOG("Leaving moon athmosphere ");
 		LOG("Entring the outer space ");
-	}	
+	}
 	// --------------------------------------------------	
 	// Win Scancode
 	if (finished)
@@ -313,6 +323,7 @@ bool Player::Update(float dt)
 			body->SetLinearVelocity(0,0);
 			body->SetAngle(0);
 			body->type = reBodyType::EARTH_GRAVITY;
+			app->audio->PlayMusic("Assets/Audio/Music/landing.ogg", 80);
 		}
 	}
 
@@ -354,6 +365,8 @@ bool Player::PostUpdate()
 	{
 		deadAnim = false;
 		lost = true;
+		app->audio->StopMusic();
+		app->audio->PlayFx(loseFx, 50);
 		explosionAnim.Reset();
 	}
 

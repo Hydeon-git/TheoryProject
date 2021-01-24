@@ -85,7 +85,7 @@ bool Audio::CleanUp()
 }
 
 // Play a music file
-bool Audio::PlayMusic(const char* path, float fadeTime)
+bool Audio::PlayMusic(const char* path, int volume, float fadeTime)
 {
 	bool ret = true;
 
@@ -108,6 +108,7 @@ bool Audio::PlayMusic(const char* path, float fadeTime)
 	}
 
 	music = Mix_LoadMUS(path);
+	Mix_VolumeMusic(volume);
 
 	if(music == NULL)
 	{
@@ -137,8 +138,13 @@ bool Audio::PlayMusic(const char* path, float fadeTime)
 	LOG("Successfully playing %s", path);
 	return ret;
 }
+// Stop current music
+bool Audio::StopMusic()
+{
+	return Mix_HaltMusic();
+}
 
-// Load WAV
+// Load Fx
 unsigned int Audio::LoadFx(const char* path)
 {
 	unsigned int ret = 0;
@@ -160,9 +166,24 @@ unsigned int Audio::LoadFx(const char* path)
 
 	return ret;
 }
+// Play Fx
+bool Audio::PlayFx(unsigned int id, int volume, int repeat)
+{
+	bool ret = false;
 
-// Play WAV
-bool Audio::PlayFx(unsigned int id, int repeat)
+	Mix_Chunk* chunk = NULL;
+	
+	if (fx.at(id - 1, chunk) == true)
+	{
+		Mix_Volume(-1, volume);
+		Mix_PlayChannel(-1, chunk, repeat);
+		ret = true;
+	}
+
+	return ret;
+}
+// Stop Fx
+bool Audio::StopFx(unsigned int id)
 {
 	bool ret = false;
 
@@ -170,7 +191,7 @@ bool Audio::PlayFx(unsigned int id, int repeat)
 
 	if (fx.at(id - 1, chunk) == true)
 	{
-		Mix_PlayChannel(-1, chunk, repeat);
+		Mix_HaltChannel(-1);
 		ret = true;
 	}
 

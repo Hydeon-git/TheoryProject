@@ -32,15 +32,11 @@ bool Scene::Awake()
 // Called before the first frame
 bool Scene::Start()
 {
+	// Texture Load
 	groundTex = app->tex->Load("Assets/Textures/ground.png");
 	fondo = app->tex->Load("Assets/Textures/background.png");
-	app->audio->PlayMusic("Assets/Audio/Music/music_spy.ogg");
-
-	//floor = app->physics->CreateBody("floor", BodyType::STATIC);
-	//floor->SetRadius(PIXEL_TO_METERS(1000));
-	//int x = SCREEN_WIDTH / 2;
-	//int y = 1250 + 2 * floor->GetBodyRadius();
-	//floor->SetPosition(reVec2(PIXEL_TO_METERS(x), PIXEL_TO_METERS(y)));
+	// Play Music
+	app->audio->PlayMusic("Assets/Audio/Music/landing.ogg", 80);
 
 	return true;
 }
@@ -55,8 +51,6 @@ bool Scene::PreUpdate()
 bool Scene::Update(float dt)
 {
 	app->render->DrawTexture(fondo, 0, -8000 + SCREEN_HEIGHT);
-	//app->render->DrawTexture(groundTex, SCREEN_WIDTH / 6, 600);
-	
 
 	return true;
 }
