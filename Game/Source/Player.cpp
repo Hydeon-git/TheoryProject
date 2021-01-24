@@ -88,19 +88,14 @@ bool Player::PreUpdate()
 bool Player::Update(float dt)
 {
 	// --------------------------------------------------
-	// Get Player Position
+	// Get Player Position and set angle
 	reVec2 pos = body->GetPosition();
-
-	if (app->input->GetKey(SDL_SCANCODE_2) == KEY_DOWN)
-	{
-		moon = true;
-	}
-
-
+	
 	if ((body->GetAngle() * RADTODEG >= 360) || (body->GetAngle() * RADTODEG <= -360))
 	{
 		body->SetAngle(0);
 	}
+	// --------------------------------------------------
 	// Player Movement
 	if ((app->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) && (!moonAnim) && (!deadAnim) && (!lost) && (!finished))
 	{
@@ -136,6 +131,7 @@ bool Player::Update(float dt)
 		body->SetPosition(PIXEL_TO_METERS(SCREEN_WIDTH - 0.5), pos.y);
 		body->SetLinearVelocity(0, body->GetLinearVelocity().y);
 	}
+	// --------------------------------------------------
 	// Check Ship Angles and Velocity
 	if (app->render->camera.y >= 8000 - SCREEN_HEIGHT)
 	{	
@@ -227,11 +223,12 @@ bool Player::Update(float dt)
 			}
 		}
 	}
+	// --------------------------------------------------
+	// Linear velocity to 0 when we are stationed
 	if (!launched && !app->input->GetKey(SDL_SCANCODE_W) == KEY_DOWN)
 	{
 		body->SetLinearVelocity(0, 0);
 	}
-	// --------------------------------------------------
 	// Can rotate?
 	if ((pos.y <= 10) && (pos.y >= -143)) launched = true;
 	else launched = false;
@@ -239,7 +236,7 @@ bool Player::Update(float dt)
 	if ((pos.y <= 9) && (pos.y >= -142)) rotation = true;
 	else rotation = false;
 	// --------------------------------------------------
-	// Gravity Changes
+	// Gravity Zones
 	if ((pos.y <= -50) && (!earthLeft))
 	{
 		earthLeft = true;
@@ -275,8 +272,7 @@ bool Player::Update(float dt)
 		LOG("Leaving moon athmosphere ");
 		LOG("Entring the outer space ");
 	}	
-	// --------------------------------------------------
-	
+	// --------------------------------------------------	
 	// Win Scancode
 	if (finished)
 	{
