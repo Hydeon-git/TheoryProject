@@ -38,7 +38,6 @@ bool Scene::Start()
 
 	// Play Music
 	app->audio->PlayMusic("Assets/Audio/Music/landing.ogg", 80);
-
 	return true;
 }
 

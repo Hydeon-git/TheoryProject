@@ -130,8 +130,8 @@ void PhysicsEngine::step(float dt)
 		else if (item->data->type == reBodyType::NO_GRAVITY && item->data->IsActive())
 		{
 			integrateVerlet(item->data->GetPosition(), item->data->GetLinearVelocity(), item->data->GetAcceleration(), dt);
-
 		}
+
 		item = item->next;
 	}
 }

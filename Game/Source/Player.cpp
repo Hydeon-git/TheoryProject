@@ -74,7 +74,9 @@ bool Player::Start()
 	// --------------------------------------------------
 	// SoundFx loading
 	explosionFx = app->audio->LoadFx("Assets/Audio/Fx/explosion.ogg");
-	loseFx = app->audio->LoadFx("Assets/Audio/Fx/loseFx.ogg");
+	loseFx = app->audio->LoadFx("Assets/Audio/Fx/lose.ogg");
+	winFx = app->audio->LoadFx("Assets/Audio/Fx/win.ogg");
+	landedFx = app->audio->LoadFx("Assets/Audio/Fx/eagleLanded.ogg");
 	// --------------------------------------------------
 	// Create Spaceship and set properties
 	body = app->physics->createBody(reBodyType::EARTH_GRAVITY);
@@ -243,6 +245,7 @@ bool Player::Update(float dt)
 	else launched = false;	
 	if ((pos.y <= 9) && (pos.y >= -142)) rotation = true;
 	else rotation = false;
+
 	// --------------------------------------------------
 	// Gravity Zones
 	if ((pos.y <= -50) && (!earthLeft))
@@ -303,17 +306,13 @@ bool Player::Update(float dt)
 			body->SetPosition(10, 10);
 			body->SetLinearVelocity(0,0);
 			body->SetAngle(0);
+			app->audio->StopFx(winFx);
+			app->audio->PlayMusic("Assets/Audio/Music/landing.ogg", 80);
 		}
 	}
 	// Lose Scancode
 	if (lost)
 	{
-		if (loseEffect)
-		{
-			app->audio->PlayFx(loseFx, 50);
-			loseEffect = false;
-		}
-		
 		if (app->input->GetKey(SDL_SCANCODE_RETURN) == KEY_DOWN)
 		{
 			moon = false;
@@ -330,6 +329,7 @@ bool Player::Update(float dt)
 			app->audio->PlayMusic("Assets/Audio/Music/landing.ogg", 80);
 		}
 	}
+
 	// Animations HasFinished and Update
 	if (astronautAnimR.HasFinished())
 	{
@@ -348,7 +348,7 @@ bool Player::Update(float dt)
 	}
 	if (moonAnim) astronautAnimR.Update(dt);
 	if (moonAnim) astronautAnimL.Update(dt);
-	if(deadAnim) explosionAnim.Update(dt);
+	if (deadAnim) explosionAnim.Update(dt);
 	flagAnim.Update(dt);
 	return true;
 }
@@ -358,9 +358,9 @@ bool Player::PostUpdate()
 {
 	bool ret = true;
 	SDL_Rect rect = { 0,0,58,141 };
-	if (!launching && !deadAnim && !lost) app->render->DrawTexture(spaceship, METERS_TO_PIXELS(body->GetPosition().x-18), METERS_TO_PIXELS(body->GetPosition().y-35), &rect, 1.0f, body->GetAngle() * RADTODEG);
-	else if (launching && !lost) app->render->DrawTexture(fireSpaceship, METERS_TO_PIXELS(body->GetPosition().x-18), METERS_TO_PIXELS(body->GetPosition().y-35), &rect, 1.0f, body->GetAngle() * RADTODEG);
-	
+	if (!launching && !deadAnim && !lost) app->render->DrawTexture(spaceship, METERS_TO_PIXELS(body->GetPosition().x - 18), METERS_TO_PIXELS(body->GetPosition().y - 35), &rect, 1.0f, body->GetAngle() * RADTODEG);
+	else if (launching && !lost) app->render->DrawTexture(fireSpaceship, METERS_TO_PIXELS(body->GetPosition().x - 18), METERS_TO_PIXELS(body->GetPosition().y - 35), &rect, 1.0f, body->GetAngle() * RADTODEG);
+
 	if (moonPlayerLeft)
 	{
 		if (moonAnim && !flagMoon) app->render->DrawTexture(astronaut, astronautPosX, astronautPosY, &(astronautAnimR.GetCurrentFrame()), 1.0f);
@@ -371,7 +371,7 @@ bool Player::PostUpdate()
 		if (moonAnim && !flagMoon) app->render->DrawTexture(astronaut, astronautPosX, astronautPosY, &(astronautAnimL.GetCurrentFrame()), 1.0f);
 		else if (flagMoon) app->render->DrawTexture(flag, flagPosX, flagPosY, &(flagAnim.GetCurrentFrame()), 1.0f);
 	}
-	
+
 	if (deadAnim)
 	{
 		if (explosionEffect)
@@ -379,18 +379,26 @@ bool Player::PostUpdate()
 			app->audio->PlayFx(explosionFx, 30);
 			explosionEffect = false;
 		}
-		
+
 		app->render->DrawTexture(explosion, METERS_TO_PIXELS(body->GetPosition().x - 22), METERS_TO_PIXELS(body->GetPosition().y), &(explosionAnim.GetCurrentFrame()), 1.0f);
 	}
-		
-		
-	
-	if (lost) app->render->DrawTexture(loseScene, 0, 0);
-	
+	if (moonAnim && !flagMoon) app->audio->PlayFx(landedFx, 30);
+	if (lost)
+	{
+		if (loseEffect)
+		{
+			app->audio->PlayFx(loseFx, 50);
+			loseEffect = false;
+		}
+		app->render->DrawTexture(loseScene, 0, 0);
+	}
 
-
-
-	if (finished) app->render->DrawTexture(winScene, 0, 0);
+	if (finished)
+	{
+		app->audio->StopMusic();
+		app->audio->PlayFx(winFx, 10);
+		app->render->DrawTexture(winScene, 0, 0);
+	}
 
 	if (app->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_DOWN)
 		ret = false;
@@ -401,7 +409,7 @@ bool Player::PostUpdate()
  //Called before quitting
 bool Player::CleanUp()
 {
-	//LOG("Freeing scene");
+	LOG("Freeing scene");
 
 	return true;
 }

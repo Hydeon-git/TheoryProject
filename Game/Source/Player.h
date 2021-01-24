@@ -35,11 +35,9 @@ public:
 	// Called before quitting
 	bool CleanUp();
 
-	inline reBody* GetBody()
-	{
-		return body;
-	}
-
+	inline reBody* GetBody() { return body;}
+	
+	
 private:
 	reBody* body;
 
@@ -89,7 +87,10 @@ private:
 	// SoundFx
 	int explosionFx;
 	int loseFx;
+	int winFx;
+	int landedFx;
 	bool loseEffect = false;
+	bool winEffect = false;
 	bool explosionEffect = false;
 };
 

@@ -17,7 +17,7 @@
 #define WIN_BORDERLESS false
 #define WIN_FULLSCREEN_DESKTOP false
 #define VSYNC true
-#define TITLE "3D Physics Playground"
+#define TITLE "Rocket Engine || by Xeics Games"
 
 
 #define LOG(format, ...) log(__FILE__, __LINE__, format, __VA_ARGS__);
