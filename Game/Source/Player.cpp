@@ -162,7 +162,6 @@ bool Player::Update(float dt)
 				flagPosY = METERS_TO_PIXELS(body->GetPosition().y - 10);
 				astronautPosY = METERS_TO_PIXELS(body->GetPosition().y - 25);
 			}
-			
 			if (body->GetLinearVelocity().y > -20)
 			{
 				float ang = body->GetAngle();
@@ -175,18 +174,16 @@ bool Player::Update(float dt)
 					if (!flagMoon) moonAnim = true;
 				}
 				else
-				{
-					body->SetPosition(pos.x, -143);
-					body->SetLinearVelocity(0, body->GetLinearVelocity().y);
-					app->audio->PlayFx(explosionFx, 30);
+				{					
+					body->SetLinearVelocity(0, 0);
+					explosionEffect = true;
 					if (!lost) deadAnim = true;
 				}
 			}
 			else
-			{
-				body->SetPosition(pos.x, -143);
-				body->SetLinearVelocity(0, body->GetLinearVelocity().y);
-				app->audio->PlayFx(explosionFx, 30);
+			{				
+				body->SetLinearVelocity(0, 0); 
+				explosionEffect = true;
 				if (!lost) deadAnim = true;
 			}
 		}
@@ -217,9 +214,8 @@ bool Player::Update(float dt)
 				{
 					moon = false;
 					body->SetAngle(0);
-					body->SetPosition(pos.x, 10);
-					body->SetLinearVelocity(0, body->GetLinearVelocity().y);
-					app->audio->PlayFx(explosionFx, 30);
+					body->SetLinearVelocity(0, 0);
+					explosionEffect = true;
 					if (!lost) deadAnim = true;
 				}
 			}
@@ -227,9 +223,8 @@ bool Player::Update(float dt)
 			{
 				moon = false;
 				body->SetAngle(0);
-				body->SetPosition(pos.x, 10);
-				body->SetLinearVelocity(0, body->GetLinearVelocity().y);
-				app->audio->PlayFx(explosionFx, 30);
+				body->SetLinearVelocity(0, 0); 
+				explosionEffect = true;
 				if (!lost) deadAnim = true;
 			}
 		}
@@ -310,6 +305,12 @@ bool Player::Update(float dt)
 	// Lose Scancode
 	if (lost)
 	{
+		if (loseEffect)
+		{
+			app->audio->PlayFx(loseFx, 50);
+			loseEffect = false;
+		}
+		
 		if (app->input->GetKey(SDL_SCANCODE_RETURN) == KEY_DOWN)
 		{
 			moon = false;
@@ -326,7 +327,22 @@ bool Player::Update(float dt)
 			app->audio->PlayMusic("Assets/Audio/Music/landing.ogg", 80);
 		}
 	}
-
+	// Animations HasFinished and Update
+	if (astronautAnimR.HasFinished())
+	{
+		moonAnim = false;
+		flagMoon = true;
+		launched = false;
+		astronautAnimR.Reset();
+	}
+	if (explosionAnim.HasFinished())
+	{
+		deadAnim = false;
+		lost = true;
+		loseEffect = true;
+		body->SetPosition(10, 10);
+		explosionAnim.Reset();
+	}
 	if (moonAnim) astronautAnimR.Update(dt);
 	if(deadAnim) explosionAnim.Update(dt);
 	flagAnim.Update(dt);
@@ -352,29 +368,21 @@ bool Player::PostUpdate()
 		else if (flagMoon) app->render->DrawTexture(flag, flagPosX, flagPosY, &(flagAnim.GetCurrentFrame()), 1.0f);
 	}
 	
-	if (deadAnim) app->render->DrawTexture(explosion, METERS_TO_PIXELS(body->GetPosition().x - 22), METERS_TO_PIXELS(body->GetPosition().y), &(explosionAnim.GetCurrentFrame()), 1.0f);
-
-	if (astronautAnimR.HasFinished())
+	if (deadAnim)
 	{
-		moonAnim = false;
-		flagMoon = true;
-		launched = false;
-		astronautAnimR.Reset();
+		if (explosionEffect)
+		{
+			app->audio->PlayFx(explosionFx, 30);
+			explosionEffect = false;
+		}
+		
+		app->render->DrawTexture(explosion, METERS_TO_PIXELS(body->GetPosition().x - 22), METERS_TO_PIXELS(body->GetPosition().y), &(explosionAnim.GetCurrentFrame()), 1.0f);
 	}
-	if (explosionAnim.HasFinished())
-	{
-		deadAnim = false;
-		lost = true;
-		app->audio->StopMusic();
-		app->audio->PlayFx(loseFx, 50);
-		explosionAnim.Reset();
-	}
-
-	if (lost)
-	{
-		app->render->DrawTexture(loseScene, 0, -8000 + SCREEN_HEIGHT);
-		app->render->DrawTexture(loseScene, 0, 0);
-	}
+		
+		
+	
+	if (lost) app->render->DrawTexture(loseScene, 0, 0);
+	
 
 
 

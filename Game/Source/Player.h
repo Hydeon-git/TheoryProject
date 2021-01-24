@@ -88,7 +88,9 @@ private:
 
 	// SoundFx
 	int explosionFx;
-	int loseFx;	
+	int loseFx;
+	bool loseEffect = false;
+	bool explosionEffect = false;
 };
 
 #endif // __PLAYER_H__
