@@ -9,11 +9,17 @@ Player::Player() : Module()
 {
 	name.Create("player");
 
-	astronautAnim.PushBack({ 0,0,68,85 });
-	astronautAnim.PushBack({ 69,0,64,85 });
-	astronautAnim.PushBack({ 133,0,67,88 });
-	astronautAnim.loop = false;
-	astronautAnim.speed = 0.001f;
+	astronautAnimR.PushBack({ 0,0,68,85 });
+	astronautAnimR.PushBack({ 69,0,64,85 });
+	astronautAnimR.PushBack({ 133,0,67,88 });
+	astronautAnimR.loop = false;
+	astronautAnimR.speed = 3.0f;
+	
+	astronautAnimL.PushBack({ 201,0,68,85 });
+	astronautAnimL.PushBack({ 269,0,63,85 });
+	astronautAnimL.PushBack({ 334,0,66,88 });
+	astronautAnimL.loop = false;
+	astronautAnimL.speed = 3.0f;
 
 	explosionAnim.PushBack({   0,  0,  88,88 });
 	explosionAnim.PushBack({  88, 0, 88,88 });
@@ -32,11 +38,11 @@ Player::Player() : Module()
 	explosionAnim.PushBack({ 176,264,88,88 });
 	explosionAnim.PushBack({ 264,264,88,88 });
 	explosionAnim.loop = false;
-	explosionAnim.speed = 0.01f;
+	explosionAnim.speed = 14.0f;
 
 	flagAnim.PushBack({ 0,0,46,54 });
 	flagAnim.PushBack({ 47,0,46,54 });
-	flagAnim.speed = 0.001;
+	flagAnim.speed = 3.0f;
 }
 // Destructor
 Player::~Player()
@@ -85,31 +91,36 @@ bool Player::Update(float dt)
 	// Get Player Position
 	reVec2 pos = body->GetPosition();
 
+	if (app->input->GetKey(SDL_SCANCODE_2) == KEY_DOWN)
+	{
+		moon = true;
+	}
+
+
 	if ((body->GetAngle() * RADTODEG >= 360) || (body->GetAngle() * RADTODEG <= -360))
 	{
 		body->SetAngle(0);
 	}
 	// Player Movement
-	if (app->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT && !moonAnim && !deadAnim)
+	if ((app->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) && (!moonAnim) && (!deadAnim) && (!lost) && (!finished))
 	{
 		float a = body->GetAngle();
 		body->AddMomentum(a, dt);
-		//a = a * RADTODEG;
 		launching = true;
 	}
 	else launching = false;
 
-	if ((app->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) && (rotation) && !moonAnim && !deadAnim)
+	if ((app->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) && (rotation) && (!moonAnim) && (!deadAnim))
 	{
 		float b = body->GetAngle();
 
 		body->AddNegativeMomentum(b, dt);
 	}
-	if ((app->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) && (rotation) && !moonAnim && !deadAnim)
+	if ((app->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) && (rotation) && (!moonAnim) && (!deadAnim))
 	{
 		body->Rotate(90 * dt);
 	}
-	if ((app->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) && (rotation) && !moonAnim && !deadAnim)
+	if ((app->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) && (rotation) && (!moonAnim) && (!deadAnim))
 	{
 		body->Rotate(-90 * dt);
 	}
@@ -125,10 +136,30 @@ bool Player::Update(float dt)
 		body->SetPosition(PIXEL_TO_METERS(SCREEN_WIDTH - 0.5), pos.y);
 		body->SetLinearVelocity(0, body->GetLinearVelocity().y);
 	}
+	// Check Ship Angles and Velocity
 	if (app->render->camera.y >= 8000 - SCREEN_HEIGHT)
 	{	
 		if (pos.y <= -143)
 		{
+			if (!flagMoon)
+			{
+				// Get player player position for astronaut animation
+				if (pos.x < PIXEL_TO_METERS(SCREEN_WIDTH / 2))
+				{
+					moonPlayerLeft = true;
+					flagPosX = METERS_TO_PIXELS(body->GetPosition().x + 120);
+					astronautPosX = METERS_TO_PIXELS(body->GetPosition().x + 45);
+				}
+				else
+				{
+					moonPlayerLeft = false;
+					flagPosX = METERS_TO_PIXELS(body->GetPosition().x - 120);
+					astronautPosX = METERS_TO_PIXELS(body->GetPosition().x - 45);
+				}
+				flagPosY = METERS_TO_PIXELS(body->GetPosition().y - 10);
+				astronautPosY = METERS_TO_PIXELS(body->GetPosition().y - 25);
+			}
+			
 			if (body->GetLinearVelocity().y > -20)
 			{
 				float ang = body->GetAngle();
@@ -168,13 +199,18 @@ bool Player::Update(float dt)
 					body->SetPosition(pos.x, 10);
 					if (moon)
 					{
-						body->SetLinearVelocity(0, 0);
+						winTimer.Start();
+						while (winCount <= 4.0f)
+						{
+							body->SetLinearVelocity(0, 0);
+							winCount = winTimer.Read() * 0.001f;							
+						}						
 						finished = true;
-					}
-					
+					}					
 				}
 				else
 				{
+					moon = false;
 					body->SetAngle(0);
 					body->SetPosition(pos.x, 10);
 					body->SetLinearVelocity(0, body->GetLinearVelocity().y);
@@ -183,6 +219,7 @@ bool Player::Update(float dt)
 			}
 			else
 			{
+				moon = false;
 				body->SetAngle(0);
 				body->SetPosition(pos.x, 10);
 				body->SetLinearVelocity(0, body->GetLinearVelocity().y);
@@ -194,6 +231,7 @@ bool Player::Update(float dt)
 	{
 		body->SetLinearVelocity(0, 0);
 	}
+	// --------------------------------------------------
 	// Can rotate?
 	if ((pos.y <= 10) && (pos.y >= -143)) launched = true;
 	else launched = false;
@@ -244,12 +282,20 @@ bool Player::Update(float dt)
 	{
 		if (app->input->GetKey(SDL_SCANCODE_RETURN) == KEY_DOWN)
 		{
+			// Bool resets
 			moon = false;
+			lost = false;
 			finished = false;
 			launched = false;
 			earthLeft = false;
 			outerSpace = false;
 			moonLeft = true;
+			flagMoon = false;
+
+			// Timer reset
+			winCount = 0.0f;
+		
+			// Player reset
 			body->SetPosition(10, 10);
 			body->SetLinearVelocity(0,0);
 			body->SetAngle(0);
@@ -262,6 +308,7 @@ bool Player::Update(float dt)
 		{
 			moon = false;
 			lost = false;
+			flagMoon = false;
 			launched = false;
 			earthLeft = false;
 			outerSpace = false;
@@ -273,9 +320,9 @@ bool Player::Update(float dt)
 		}
 	}
 
-	if (moonAnim) astronautAnim.Update();
-	if(deadAnim) explosionAnim.Update();
-	flagAnim.Update();
+	if (moonAnim) astronautAnimR.Update(dt);
+	if(deadAnim) explosionAnim.Update(dt);
+	flagAnim.Update(dt);
 	return true;
 }
 
@@ -284,20 +331,28 @@ bool Player::PostUpdate()
 {
 	bool ret = true;
 	SDL_Rect rect = { 0,0,58,141 };
-	if (!launching && !deadAnim) app->render->DrawTexture(spaceship, METERS_TO_PIXELS(body->GetPosition().x-18), METERS_TO_PIXELS(body->GetPosition().y-35), &rect, 1.0f, body->GetAngle() * RADTODEG);
-	else if (launching) app->render->DrawTexture(fireSpaceship, METERS_TO_PIXELS(body->GetPosition().x-18), METERS_TO_PIXELS(body->GetPosition().y-35), &rect, 1.0f, body->GetAngle() * RADTODEG);
+	if (!launching && !deadAnim && !lost) app->render->DrawTexture(spaceship, METERS_TO_PIXELS(body->GetPosition().x-18), METERS_TO_PIXELS(body->GetPosition().y-35), &rect, 1.0f, body->GetAngle() * RADTODEG);
+	else if (launching && !lost) app->render->DrawTexture(fireSpaceship, METERS_TO_PIXELS(body->GetPosition().x-18), METERS_TO_PIXELS(body->GetPosition().y-35), &rect, 1.0f, body->GetAngle() * RADTODEG);
 	
+	if (moonPlayerLeft)
+	{
+		if (moonAnim && !flagMoon) app->render->DrawTexture(astronaut, astronautPosX, astronautPosY, &(astronautAnimR.GetCurrentFrame()), 1.0f);
+		else if (flagMoon) app->render->DrawTexture(flag, flagPosX, flagPosY, &(flagAnim.GetCurrentFrame()), 1.0f);
+	}
+	else
+	{
+		if (moonAnim && !flagMoon) app->render->DrawTexture(astronaut, astronautPosX, astronautPosY, &(astronautAnimL.GetCurrentFrame()), 1.0f);
+		else if (flagMoon) app->render->DrawTexture(flag, flagPosX, flagPosY, &(flagAnim.GetCurrentFrame()), 1.0f);
+	}
 	
-	if (moonAnim && !flagMoon) app->render->DrawTexture(astronaut, METERS_TO_PIXELS(body->GetPosition().x + 45), METERS_TO_PIXELS(body->GetPosition().y - 25), &(astronautAnim.GetCurrentFrame()), 1.0f);
-	else if (flagMoon) app->render->DrawTexture(flag, METERS_TO_PIXELS(body->GetPosition().x + 120), METERS_TO_PIXELS(body->GetPosition().y - 10), &(flagAnim.GetCurrentFrame()), 1.0f);
 	if (deadAnim) app->render->DrawTexture(explosion, METERS_TO_PIXELS(body->GetPosition().x - 22), METERS_TO_PIXELS(body->GetPosition().y), &(explosionAnim.GetCurrentFrame()), 1.0f);
 
-	if (astronautAnim.HasFinished())
+	if (astronautAnimR.HasFinished())
 	{
 		moonAnim = false;
 		flagMoon = true;
 		launched = false;
-		astronautAnim.Reset();
+		astronautAnimR.Reset();
 	}
 	if (explosionAnim.HasFinished())
 	{

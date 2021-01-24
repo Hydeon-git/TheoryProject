@@ -44,6 +44,9 @@ public:
 private:
 	reBody* body;
 
+	Timer winTimer;
+	float winCount;
+
 	// Textures
 	SDL_Texture* spaceship;
 	SDL_Texture* fireSpaceship;
@@ -53,9 +56,13 @@ private:
 	SDL_Texture* winScene;
 	SDL_Texture* loseScene;
 
-	Animation astronautAnim;
+	Animation astronautAnimR;
+	Animation astronautAnimL;
 	Animation explosionAnim;
 	Animation flagAnim;
+
+	float flagPosX, flagPosY;	
+	float astronautPosX, astronautPosY;	
 
 	bool moon = false;
 	bool finished = false;
@@ -75,6 +82,7 @@ private:
 	// Animations
 	bool moonAnim = false;
 	bool flagMoon = false;
+	bool moonPlayerLeft;
 };
 
 #endif // __PLAYER_H__
