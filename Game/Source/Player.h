@@ -48,14 +48,19 @@ private:
 	SDL_Texture* spaceship;
 	SDL_Texture* fireSpaceship;
 	SDL_Texture* astronaut;
+	SDL_Texture* explosion;
 	SDL_Texture* flag;
-	SDL_Texture* finish;
+	SDL_Texture* winScene;
+	SDL_Texture* loseScene;
 
 	Animation astronautAnim;
+	Animation explosionAnim;
 	Animation flagAnim;
 
 	bool moon = false;
 	bool finished = false;
+	bool deadAnim = false;
+	bool lost = false;
 	
 	// Launch control bools
 	bool launching = false;
@@ -65,7 +70,9 @@ private:
 	bool earthLeft = false;
 	bool outerSpace = false;
 	bool moonLeft = true;
-	bool landedMoon = false;
+
+	bool moonAnim = false;
+	bool flagMoon = false;
 };
 
 #endif // __PLAYER_H__

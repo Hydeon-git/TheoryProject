@@ -15,6 +15,25 @@ Player::Player() : Module()
 	astronautAnim.loop = false;
 	astronautAnim.speed = 0.0001f;
 
+	explosionAnim.PushBack({   0,  0,  88,88 });
+	explosionAnim.PushBack({  88, 0, 88,88 });
+	explosionAnim.PushBack({ 176,0, 88,88 });
+	explosionAnim.PushBack({ 264,0, 88,88 });
+	explosionAnim.PushBack({ 0, 88, 88,88 });
+	explosionAnim.PushBack({ 88,88,88,88 });
+	explosionAnim.PushBack({ 176,88,88,88 });
+	explosionAnim.PushBack({ 264,88,88,88 });
+	explosionAnim.PushBack({ 0, 176, 88,88 });
+	explosionAnim.PushBack({ 88,176,88,88 });
+	explosionAnim.PushBack({ 176,176,88,88 });
+	explosionAnim.PushBack({ 264,176,88,88 });
+	explosionAnim.PushBack({ 0, 264, 88,88 });
+	explosionAnim.PushBack({ 88,264,88,88 });
+	explosionAnim.PushBack({ 176,264,88,88 });
+	explosionAnim.PushBack({ 264,264,88,88 });
+	explosionAnim.loop = false;
+	explosionAnim.speed = 0.001f;
+
 	flagAnim.PushBack({ 0,0,46,54 });
 	flagAnim.PushBack({ 47,0,46,54 });
 	flagAnim.speed = 0.0001f;
@@ -38,8 +57,10 @@ bool Player::Start()
 	spaceship = app->tex->Load("Assets/Textures/spaceship.png");
 	fireSpaceship = app->tex->Load("Assets/Textures/fireSpaceship.png");
 	astronaut = app->tex->Load("Assets/Textures/astronaut.png");
+	explosion = app->tex->Load("Assets/Textures/explosion.png");
 	flag = app->tex->Load("Assets/Textures/flag.png");
-	finish = app->tex->Load("Assets/Textures/finish.png");
+	loseScene = app->tex->Load("Assets/Textures/loseScene.png");
+	winScene = app->tex->Load("Assets/Textures/winScene.png");
 
 	body = app->physics->CreateBody("player", BodyType::EARTH_GRAVITY);
 
@@ -65,27 +86,33 @@ bool Player::Update(float dt)
 	// --------------------------------------------------
 	// Get Player Position
 	reVec2 pos = body->GetPosition();
+
+	if ((body->GetBodyAngle() * RADTODEG >= 360) || (body->GetBodyAngle() * RADTODEG <= -360))
+	{
+		body->SetBodyAngle(0);
+	}
 	// Player Movement
-	if (app->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT)
+	if (app->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT && !moonAnim && !deadAnim)
 	{
 		float a = body->GetBodyAngle();
 		body->AddMomentum(a, dt);
+		//a = a * RADTODEG;
 		launching = true;
 	}
 	else launching = false;
 
-	if (app->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
+	if ((app->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) && (launched) && !moonAnim && !deadAnim)
 	{
 		float b = body->GetBodyAngle();
+
 		body->AddNegativeMomentum(b, dt);
-		launching = true;
 	}
 
-	if ((app->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) && (launched))
+	if ((app->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) && (launched) && !moonAnim && !deadAnim)
 	{
 		body->Rotate(90 * dt);
 	}
-	if ((app->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) && (launched))
+	if ((app->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) && (launched) && !moonAnim && !deadAnim)
 	{
 		body->Rotate(-90 * dt);
 	}
@@ -103,14 +130,22 @@ bool Player::Update(float dt)
 	}
 	if (app->render->camera.y >= 8000 - SCREEN_HEIGHT)
 	{
-		if (pos.y <= -143 )
+		if (pos.y <= -143)
 		{
-			body->SetPosition(pos.x, -143);
-			if (!moon)
+			float ang = body->GetBodyAngle();
+			ang = ang * RADTODEG;
+			if (((ang > 160 && ang < 200) || (ang < -160 && ang > -200)) && body->GetLinearVelocity().y > -20)
 			{
-				body->SetLinearVelocity(0, 0);
+				body->SetPosition(pos.x, -143);
+				body->SetLinearVelocity(0, body->GetLinearVelocity().y);
+				if(!flagMoon) moonAnim = true;
 			}
-			body->SetLinearVelocity(0, body->GetLinearVelocity().x);
+			else
+			{
+				body->SetPosition(pos.x, -143);
+				body->SetLinearVelocity(0, body->GetLinearVelocity().y);
+				if (!lost) deadAnim = true;
+			}
 		}
 		moon = true;
 	}
@@ -118,6 +153,12 @@ bool Player::Update(float dt)
 	{
 		launched = true;
 	}
+	// --------------------------------------------------
+	
+
+
+
+
 	// --------------------------------------------------
 	// Gravity Changes
 	if ((pos.y <= -50) && (!earthLeft))
@@ -138,6 +179,10 @@ bool Player::Update(float dt)
 		LOG("Entring moon athmosphere ");
 	}
 	// --------------------------------------------------
+	if (pos.y >= 10 && (!app->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT))
+	{
+		body->SetLinearVelocity(0, 0);
+	}
 	// Win Condition
 	if (pos.y >= 10)
 	{
@@ -155,13 +200,37 @@ bool Player::Update(float dt)
 		{
 			moon = false;
 			finished = false;
+			launched = false;
+			earthLeft = false;
+			outerSpace = false;
+			moonLeft = true;
 			reVec2 pos2 = reVec2(10, 10);
 			body->SetPosition(pos2);
 			body->SetLinearVelocity(0,0);
+			body->SetBodyAngle(0);
+		}
+	}
+	// Lose Scancode
+	if (lost)
+	{
+		if (app->input->GetKey(SDL_SCANCODE_RETURN) == KEY_DOWN)
+		{
+			moon = false;
+			lost = false;
+			launched = false;
+			earthLeft = false;
+			outerSpace = false;
+			moonLeft = true;
+			reVec2 pos2 = reVec2(10, 10);
+			body->SetPosition(pos2);
+			body->SetLinearVelocity(0,0);
+			body->SetBodyAngle(0);
+			body->type = BodyType::EARTH_GRAVITY;
 		}
 	}
 
-	astronautAnim.Update();
+	if (moonAnim) astronautAnim.Update();
+	if(deadAnim) explosionAnim.Update();
 	flagAnim.Update();
 	return true;
 }
@@ -171,17 +240,30 @@ bool Player::PostUpdate()
 {
 	bool ret = true;
 	SDL_Rect rect = { 0,0,58,141 };
-	if (!launching) app->render->DrawTexture(spaceship, METERS_TO_PIXELS(body->GetPosition().x-18), METERS_TO_PIXELS(body->GetPosition().y-35), &rect, 1.0f, body->GetBodyAngle() * 180 / PI);
-	else if (launching) app->render->DrawTexture(fireSpaceship, METERS_TO_PIXELS(body->GetPosition().x-18), METERS_TO_PIXELS(body->GetPosition().y-35), &rect, 1.0f, body->GetBodyAngle() * 180 / PI);
-	if (finished) app->render->DrawTexture(finish, 0, 0);
-	if (!landedMoon) app->render->DrawTexture(astronaut, METERS_TO_PIXELS(body->GetPosition().x + 45), METERS_TO_PIXELS(body->GetPosition().y - 25), &(astronautAnim.GetCurrentFrame()), 1.0f);
-	else if (landedMoon) app->render->DrawTexture(flag, METERS_TO_PIXELS(body->GetPosition().x + 120), METERS_TO_PIXELS(body->GetPosition().y - 10), &(flagAnim.GetCurrentFrame()), 1.0f);
+	if (!launching && !deadAnim) app->render->DrawTexture(spaceship, METERS_TO_PIXELS(body->GetPosition().x-18), METERS_TO_PIXELS(body->GetPosition().y-35), &rect, 1.0f, body->GetBodyAngle() * RADTODEG);
+	else if (launching) app->render->DrawTexture(fireSpaceship, METERS_TO_PIXELS(body->GetPosition().x-18), METERS_TO_PIXELS(body->GetPosition().y-35), &rect, 1.0f, body->GetBodyAngle() * RADTODEG);
+	
+	
+	if (moonAnim && !flagMoon) app->render->DrawTexture(astronaut, METERS_TO_PIXELS(body->GetPosition().x + 45), METERS_TO_PIXELS(body->GetPosition().y - 25), &(astronautAnim.GetCurrentFrame()), 1.0f);
+	else if (flagMoon) app->render->DrawTexture(flag, METERS_TO_PIXELS(body->GetPosition().x + 120), METERS_TO_PIXELS(body->GetPosition().y - 10), &(flagAnim.GetCurrentFrame()), 1.0f);
+	if (deadAnim) app->render->DrawTexture(explosion, METERS_TO_PIXELS(body->GetPosition().x - 22), METERS_TO_PIXELS(body->GetPosition().y), &(explosionAnim.GetCurrentFrame()), 1.0f);
 
 	if (astronautAnim.HasFinished())
 	{
-		landedMoon = true;
+		moonAnim = false;
+		flagMoon = true;
 		astronautAnim.Reset();
 	}
+	if (explosionAnim.HasFinished())
+	{
+		deadAnim = false;
+		lost = true;
+		explosionAnim.Reset();
+	}
+
+	if (lost) app->render->DrawTexture(loseScene, 0, -8000 + SCREEN_HEIGHT);
+	if (finished) app->render->DrawTexture(winScene, 0, 0);
+
 	if (app->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_DOWN)
 		ret = false;
 

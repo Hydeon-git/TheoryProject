@@ -17,132 +17,102 @@ public:
 		y = newY;
 	}
 
-	// Set new values for the vector
-	void SetVector(float newX, float newY)
-	{
-		x = newX;
-		y = newY;
-	}
+	// Set this vector to some specified coordinates.
+	void Set(float x_, float y_) { x = x_; y = y_; }
 
-	// Ngeate a vector
-	reVec2 Negate(reVec2 v)
-	{
-		v.x = -v.x;
-		v.y = -v.y;
-	}
+	// Set this vector to all zeros.
+	void SetZero() { x = 0.0f; y = 0.0f; }
 
-	// Negate a vector
-	reVec2 Negate()
-	{
-		reVec2 aux;
-		aux.x = -x;
-		aux.y = -y;
-
-		return aux;
-	}
-
-	// Get the perpendicular vector
-	reVec2 Perpendicular(reVec2& v)
-	{
-		reVec2 ret;
-		ret.x = v.y;
-		ret.y = -v.x;
-		return ret;
-	}
-
-	reVec2 Normalize()
-	{
-		reVec2 aux = reVec2(x, y);
-		float l = sqrt(pow(aux.x, 2) + pow(aux.y, 2));
-		aux = aux / l;
-		return aux;
-	}
-
-	float Dot(reVec2& v)
-	{
-		return x * v.x + y * v.y;
-	}
-
-	// Vector addition
-	void operator += (const reVec2& v)
+	// Add a vector
+	void operator +=(const reVec2& v)
 	{
 		x += v.x;
 		y += v.y;
 	}
-
-	reVec2 operator + (const reVec2& v)
+	reVec2 operator +(const reVec2& v)
 	{
-		reVec2 nv;
-		nv.x = x + v.x;
-		nv.y = y + v.y;
-		return nv;
+		reVec2 vec;
+		vec.x = x + v.x;
+		vec.y = y + v.y;
+		return v;
 	}
 
-	reVec2 operator + (const float& a)
-	{
-		reVec2 nv;
-		nv.x = x + a;
-		nv.y = y + a;
-		return nv;
-	}
-
-	// Vector substraction
-	void operator -= (const reVec2& v)
+	// Subtract a vector
+	void operator -=(const reVec2& v)
 	{
 		x -= v.x;
 		y -= v.y;
 	}
-
-	reVec2 operator- (reVec2& v)
+	reVec2 operator -(const reVec2& v)
 	{
-		reVec2 nv;
-		nv.x = x - v.x;
-		nv.y = y - v.y;
-		return nv;
+		reVec2 vec;
+		vec.x = x - v.x;
+		vec.y = y - v.y;
+		return v;
+
 	}
 
-	// Multply a vector by a scalar
-	reVec2 operator *= (float a)
+	// Multply a vector
+	void operator *=(float a)
 	{
-		reVec2 nv;
-		nv.x = x * a;
-		nv.y = y * a;
-		return nv;
+		x *= a;
+		y *= a;
+	}
+	reVec2 operator *(float a)
+	{
+		reVec2 v;
+		v.x = x * a;
+		v.y = y * a;
+		return v;
 	}
 
-	reVec2 operator*(reVec2& a)
+	// Divide a vector
+	void operator /=(float& a)
 	{
-		reVec2 nv;
-		nv.x = x * a.x;
-		nv.y = y * a.y;
-		return nv;
+		x /= a;
+		y /= a;
+	}
+	reVec2 operator /(float& a)
+	{
+		reVec2 v;
+		v.x = x / a;
+		v.y = y / a;
+		return v;
 	}
 
-	reVec2 operator*(float a)
-	{
-		reVec2 aux;
-		aux.x = x * a;
-		aux.y = y * a;
-
-		return aux;
-	}
-
-	void operator*(double& a)
-	{
-		x = x * a;
-		y = y * a;
-	}
-
-	reVec2 operator/(float& a)
-	{
-		reVec2 nv;
-		nv.x = x / a;
-		nv.y = y / a;
-		return nv;
-	}
-
+	//Compare vectors
 	bool operator< (reVec2 v)
 	{
 		return (x < v.x) && (y < v.y);
 	}
+	bool operator== (reVec2 v)
+	{
+		return (x == v.x) && (y == v.y);
+	}
+
+	/// Convert this vector into a unit vector. Returns the length.
+	reVec2 Normalize()
+	{
+		reVec2 aux = reVec2(x, y);
+		float l = sqrt(pow(aux.x, 2) + pow(aux.y, 2));
+		if (l != 0)
+		{
+			aux = aux / l;
+			return aux;
+		}
+		else return { 0,0 };
+	}
+
+	// Length of vector (norm)
+	float Length() const
+	{
+		return sqrtf(x * x + y * y);
+	}
+
+	// Length squared
+	float LengthSquared() const
+	{
+		return x * x + y * y;
+	}
+	
 };
