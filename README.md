@@ -1,30 +1,28 @@
-# {Project Name}
+# ROCKET ENGINE
 
 ## Description
 
-{project description}
+Rocket Engine is a simulation of the Apollo's 11 mission. You have to control the rocket, being aware of 
+the gravity, to land safely at the moon and return safely to the earth.
+This project was developed for Physics II subject in UPC-CITM (Terrassa) by XeicsGames.
 
-## Key Features
+## How to play
 
- - {Feature01}
- - {Feature02}
- - {Feature03}
- - {Feature04}
+ - Control the rocket to land safely on the moon and return, safely, to the earth.
+ - Be aware of the gravity and try to take advantage of it. 
  
 ## Controls
 
- - {ControlsScheme}
+ - W for forward movement.
+ - S for backward movement.
+ - A,D for rotation movement.
+ - ENTER to play again on win and lose screens. 
 
 ## Developers
 
- - {Dev01} - {Role(s)}
- - {Dev02} - {Role(s)}
- - {Dev03} - {Role(s)}
- - {Dev04} - {Role(s)}
- - {Dev05} - {Role(s)}
+ - Arnau Bonada 
+ - Albert Pou 
+ - Andreu Landa
 
-## License
+## Github Release
 
-This project is licensed under an unmodified MIT license, which is an OSI-certified license that allows static linking with closed source software. Check [LICENSE](LICENSE) for further details.
-
-{AdditionalLicenses}
